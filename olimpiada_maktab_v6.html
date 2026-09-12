@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Informatika olimpiadasi — maktab bosqichi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:wght@700;800&family=Dancing+Script:wght@600;700&display=swap">
+<style>
+/* =========================================================
+   DESIGN TOKENS
+   Mavzu: informatika — IDE/terminal ruhidagi akademik interfeys.
+   Fon: chuqur tun-ko'k (ink), sirt: yumshoq sovuq oq.
+   Urg'u: elektr-firuza (accent) + amber (ball/points).
+   Shrift: Sora (sarlavha), Inter (matn), JetBrains Mono (kod/raqam).
+   ========================================================= */
+:root{
+  --ink:#0b1220;
+  --ink-soft:#37475e;
+  --paper:#eef2f9;
+  --surface:#ffffff;
+  --surface-2:#f4f7fc;
+  --line:#dde4f0;
+  --line-soft:#e8edf6;
+  --accent:#0d9db3;
+  --accent-ink:#066274;
+  --accent-soft:#e2f6f8;
+  --amber:#c9740f;
+  --amber-soft:#fdf0dd;
+  --good:#1a8f5a;
+  --good-soft:#e5f6ee;
+  --bad:#c23b3b;
+  --bad-soft:#fbeaea;
+  --flag:#a5670f;
+  --flag-soft:#fdf1de;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --font-display:"Sora","Segoe UI",sans-serif;
+  --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:"JetBrains Mono","SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  --shadow-1:0 1px 2px rgba(11,18,32,.05), 0 1px 1px rgba(11,18,32,.04);
+  --shadow-2:0 10px 30px -12px rgba(11,18,32,.22);
+}
+:root[data-theme="dark"]{
+  --ink:#e8edf7;
+  --ink-soft:#a7b4cc;
+  --paper:#0a0f1c;
+  --surface:#121a2c;
+  --surface-2:#161f34;
+  --line:#243250;
+  --line-soft:#1c2740;
+  --accent:#3fd3e8;
+  --accent-ink:#8ceaf5;
+  --accent-soft:#0f2f38;
+  --amber:#f0ac4d;
+  --amber-soft:#3a2c14;
+  --good:#4fd694;
+  --good-soft:#123b2b;
+  --bad:#f28b8b;
+  --bad-soft:#3a1c1c;
+  --flag:#e8b95e;
+  --flag-soft:#3a2c14;
+  --shadow-1:0 1px 2px rgba(0,0,0,.4);
+  --shadow-2:0 20px 45px -20px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(900px 500px at 100% -10%, var(--accent-soft), transparent 60%),
+    var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  min-height:100vh;
+  line-height:1.55;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+.num,.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.hidden{display:none !important;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 56px;}
+
+/* ---------- IDE-style top chrome ---------- */
+.chrome{
+  max-width:760px;margin:0 auto;padding:16px 16px 0;
+}
+.chrome-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px 12px 0 0;
+  padding:10px 14px;box-shadow:var(--shadow-1);
+}
+.chrome-dots{display:flex;gap:6px;flex-shrink:0;}
+.chrome-dots span{width:9px;height:9px;border-radius:50%;display:block;}
+.chrome-dots span:nth-child(1){background:#e5716a;}
+.chrome-dots span:nth-child(2){background:#e8b95e;}
+.chrome-dots span:nth-child(3){background:#63c68a;}
+.chrome-title{
+  font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:center;
+}
+.theme-toggle{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
+  width:30px;height:30px;flex-shrink:0;cursor:pointer;color:var(--ink-soft);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.theme-toggle:hover{color:var(--accent-ink);border-color:var(--accent);}
+.chrome-fill{
+  height:6px;background:linear-gradient(90deg,var(--accent),var(--good));
+  border-radius:0 0 12px 12px;opacity:.55;
+}
+
+.brand-row{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  margin:22px 2px 20px;flex-wrap:wrap;
+}
+.brand-row h1{
+  font-family:var(--font-display);font-weight:700;font-size:20px;margin:0;letter-spacing:-.01em;
+}
+.brand-row .subject-tag{
+  font-family:var(--font-mono);font-size:11.5px;color:var(--accent-ink);
+  background:var(--accent-soft);padding:4px 10px;border-radius:7px;white-space:nowrap;
+}
+
+/* ---------- shared card ---------- */
+.card{
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-1);
+  padding:24px;
+}
+
+/* ---------- START SCREEN ---------- */
+#screen-start .card{max-width:560px;margin:0 auto;}
+#screen-start .lead{color:var(--ink-soft);margin:0 0 22px;font-size:13.5px;max-width:60ch;}
+#screen-start .lead b{color:var(--ink);}
+label.field-label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:7px;}
+input.text-input{
+  width:100%;padding:12px 13px;border-radius:11px;border:1.5px solid var(--line);
+  font-size:14px;margin-bottom:20px;background:var(--surface-2);color:var(--ink);font-family:var(--font-body);
+}
+input.text-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+.class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px;}
+.class-btn{
+  padding:14px 8px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--ink);text-align:center;
+  transition:border-color .15s,background .15s;font-family:var(--font-display);
+  position:relative;
+}
+.class-btn:hover{border-color:var(--accent);}
+.class-btn.selected{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);}
+.class-btn span{display:block;font-weight:500;font-size:10.5px;color:var(--ink-soft);margin-top:3px;font-family:var(--font-body);}
+.class-btn.selected span{color:var(--accent-ink);}
+.class-btn .check{
+  position:absolute;top:6px;right:7px;width:14px;height:14px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.5);transition:.15s;
+}
+.class-btn.selected .check{opacity:1;transform:scale(1);}
+
+.mode-row{display:flex;gap:9px;margin-bottom:22px;}
+.mode-btn{
+  flex:1;padding:11px 10px;border-radius:11px;border:1.5px solid var(--line);background:var(--surface-2);
+  cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-soft);text-align:center;
+}
+.mode-btn.selected{border-color:var(--amber);background:var(--amber-soft);color:var(--flag);}
+
+.primary-btn{
+  width:100%;padding:13px;border:none;border-radius:12px;background:var(--ink);color:var(--surface);
+  font-size:14.5px;font-weight:700;cursor:pointer;transition:opacity .15s;font-family:var(--font-display);
+}
+:root[data-theme="dark"] .primary-btn{background:var(--accent);color:#04141a;}
+.primary-btn:hover{opacity:.88;}
+.primary-btn:disabled{opacity:.35;cursor:not-allowed;}
+.hint-err{color:var(--bad);font-size:12.5px;margin:-11px 0 15px;min-height:15px;}
+.info-box{
+  background:var(--surface-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;
+  font-size:12px;color:var(--ink-soft);margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;
+}
+.info-box .ico{flex-shrink:0;font-family:var(--font-mono);color:var(--accent-ink);font-weight:700;}
+.tier-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;}
+.tier-legend .lg{display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--font-mono);}
+.tier-legend .dot{width:8px;height:8px;border-radius:2px;}
+
+/* ---------- QUIZ SCREEN ---------- */
+#screen-quiz .quiz-head{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;
+}
+.who{font-size:12px;color:var(--ink-soft);}
+.who b{color:var(--ink);font-weight:600;}
+.head-right{display:flex;align-items:center;gap:10px;}
+.timer-chip{
+  font-family:var(--font-mono);font-weight:700;font-size:13px;color:var(--ink-soft);
+  background:var(--surface-2);border:1px solid var(--line);padding:6px 11px;border-radius:9px;
+  display:flex;align-items:center;gap:6px;
+}
+.timer-chip.warn{color:var(--flag);border-color:var(--flag);background:var(--flag-soft);}
+.timer-chip.danger{color:var(--bad);border-color:var(--bad);background:var(--bad-soft);animation:tickPulse 1s infinite;}
+@keyframes tickPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+.progress-pill{
+  background:var(--accent-soft);color:var(--accent-ink);font-weight:700;font-size:12px;font-family:var(--font-mono);
+  padding:6px 12px;border-radius:9px;white-space:nowrap;
+}
+.progress-bar-track{height:5px;border-radius:6px;background:var(--line);margin-bottom:18px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:6px;transition:width .25s;}
+
+.nav-grid{
+  display:flex;flex-wrap:nowrap;gap:4px;margin-bottom:18px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;
+}
+.nav-dot{
+  flex:0 0 auto;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:var(--surface);
+  font-size:9px;font-weight:700;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);position:relative;
+}
+.nav-dot.answered{background:var(--good-soft);border-color:var(--good);color:var(--good);}
+.nav-dot.flagged::after{
+  content:"";position:absolute;top:-3px;right:-3px;width:6px;height:6px;border-radius:50%;background:var(--flag);
+}
+.nav-dot.current{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);color:var(--accent-ink);}
+
+.q-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;}
+.q-ball-tag{
+  display:inline-block;background:var(--amber-soft);color:var(--amber);font-weight:700;font-size:11px;
+  padding:3px 10px;border-radius:999px;font-family:var(--font-mono);
+}
+.flag-btn{
+  background:none;border:1.5px solid var(--line);border-radius:9px;padding:5px 11px;font-size:11.5px;
+  font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.flag-btn.on{border-color:var(--flag);background:var(--flag-soft);color:var(--flag);}
+
+#question-panel{animation:qIn .18s ease;}
+@keyframes qIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+.q-text p{margin:0 0 9px;font-size:14.5px;}
+.q-text p:last-child{margin-bottom:0;}
+pre.code-block{
+  background:var(--ink);color:#dce6f5;border-radius:10px;padding:12px 14px;
+  overflow-x:auto;font-family:var(--font-mono);
+  font-size:12.5px;line-height:1.6;margin:9px 0 13px;white-space:pre;
+}
+:root[data-theme="dark"] pre.code-block{background:#060a12;}
+.q-table-wrap{overflow-x:auto;margin:9px 0 15px;-webkit-overflow-scrolling:touch;}
+table.q-table{border-collapse:collapse;width:100%;font-size:12.5px;}
+table.q-table th, table.q-table td{
+  border:1px solid var(--line);padding:6px 9px;text-align:center;white-space:nowrap;
+}
+table.q-table th{background:var(--surface-2);font-weight:700;font-family:var(--font-mono);font-size:11px;}
+
+.options{margin-top:15px;display:flex;flex-direction:column;gap:9px;}
+.option{
+  display:flex;align-items:flex-start;gap:10px;padding:12px 13px;border-radius:12px;
+  border:1.5px solid var(--line);cursor:pointer;transition:border-color .12s,background .12s;background:var(--surface);
+}
+.option:hover{border-color:var(--accent);background:var(--surface-2);}
+.option.picked{border-color:var(--accent);background:var(--accent-soft);}
+.option input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0;}
+.option .opt-letter{font-weight:700;color:var(--accent-ink);min-width:16px;font-size:13.5px;font-family:var(--font-mono);}
+.option .opt-body{flex:1;font-size:13.5px;min-width:0;}
+.option .opt-body table.q-table{margin-top:6px;font-size:11.5px;}
+
+.quiz-actions{display:flex;justify-content:space-between;gap:8px;margin-top:20px;}
+.btn{
+  padding:11px 16px;border-radius:11px;border:1.5px solid var(--line);background:var(--surface);
+  font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--font-display);
+}
+.btn:hover{border-color:var(--accent);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-finish{background:var(--good);border-color:var(--good);color:#fff;}
+.btn-finish:hover{opacity:.9;}
+
+/* ---------- REVIEW SCREEN ---------- */
+#screen-review .review-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:18px 0 20px;
+}
+.review-cell{
+  aspect-ratio:1;border-radius:9px;border:1.5px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;
+  font-size:12px;color:var(--ink-soft);cursor:pointer;position:relative;
+}
+.review-cell.answered{background:var(--good-soft);border-color:var(--good);color:var(--good);}
+.review-cell.unanswered{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);}
+.review-cell.flagged::after{
+  content:"";position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;background:var(--flag);
+}
+.review-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
+.review-legend .lg{display:flex;align-items:center;gap:6px;}
+.review-legend .sw{width:11px;height:11px;border-radius:3px;}
+.review-summary-line{font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
+.review-summary-line b{color:var(--ink);}
+
+/* ---------- RESULT SCREEN ---------- */
+.score-hero{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;margin:4px auto 22px;padding:8px;
+}
+.gauge-wrap{position:relative;width:172px;height:172px;margin:0 auto 6px;}
+.gauge-wrap svg{transform:rotate(-90deg);}
+.gauge-bg{fill:none;stroke:var(--line);stroke-width:11;}
+.gauge-fill{fill:none;stroke:var(--accent);stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1);}
+.gauge-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.gauge-center .pct{font-family:var(--font-display);font-weight:800;font-size:34px;line-height:1;color:var(--ink);}
+.gauge-center .lab{font-size:10.5px;color:var(--ink-soft);margin-top:3px;font-family:var(--font-mono);}
+.verdict{font-family:var(--font-display);font-weight:700;font-size:15.5px;margin-top:8px;}
+.verdict.great{color:var(--good);}
+.verdict.ok{color:var(--accent-ink);}
+.verdict.retry{color:var(--flag);}
+
+.result-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 auto 20px;}
+.stat{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 8px;text-align:center;}
+.stat .num{font-size:17px;font-weight:800;color:var(--ink);font-family:var(--font-mono);}
+.stat .lab{font-size:10px;color:var(--ink-soft);margin-top:3px;}
+
+.tier-breakdown{margin-bottom:20px;}
+.tier-breakdown h3{font-size:12.5px;font-family:var(--font-display);margin:0 0 10px;color:var(--ink-soft);font-weight:600;}
+.tier-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px;}
+.tier-row .tname{width:96px;flex-shrink:0;font-family:var(--font-mono);color:var(--ink-soft);}
+.tier-row .tbar{flex:1;height:8px;border-radius:5px;background:var(--line);overflow:hidden;}
+.tier-row .tbar-fill{height:100%;border-radius:5px;background:var(--accent);}
+.tier-row .tval{width:64px;flex-shrink:0;text-align:right;font-family:var(--font-mono);color:var(--ink-soft);}
+
+.result-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:20px;}
+table.result-table{border-collapse:collapse;width:100%;font-size:12px;}
+table.result-table th, table.result-table td{border:1px solid var(--line);padding:7px 9px;text-align:left;}
+table.result-table th{background:var(--surface-2);font-family:var(--font-mono);font-size:10.5px;}
+table.result-table td.center{text-align:center;font-family:var(--font-mono);}
+.tag-ok{color:var(--good);font-weight:700;}
+.tag-bad{color:var(--bad);font-weight:700;}
+
+.result-actions{display:flex;gap:9px;flex-wrap:wrap;}
+.result-actions .btn{flex:1;min-width:140px;}
+
+/* ---------- CERTIFICATE (on-screen preview + print) ---------- */
+.cert-modal-overlay{
+  position:fixed;inset:0;background:rgba(6,10,18,.62);z-index:300;
+  display:flex;align-items:flex-start;justify-content:center;padding:28px 14px;overflow-y:auto;
+  backdrop-filter:blur(2px);
+}
+.cert-modal-overlay.hidden{display:none;}
+.cert-modal-inner{
+  background:#fdfdfb;border-radius:14px;max-width:620px;width:100%;padding:18px 18px 20px;
+  position:relative;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);
+}
+.cert-modal-close{
+  position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);cursor:pointer;font-size:15px;color:var(--ink-soft);z-index:2;
+  display:flex;align-items:center;justify-content:center;
+}
+.cert-modal-close:hover{color:var(--bad);border-color:var(--bad);}
+.cert-modal-actions{display:flex;gap:9px;margin-top:14px;}
+.cert-modal-actions .btn{flex:1;}
+
+/* ---------- CERTIFICATE (on-screen preview + print) ---------- */
+.cert-modal-overlay{
+  position:fixed;inset:0;background:rgba(6,10,18,.62);z-index:300;
+  display:flex;align-items:flex-start;justify-content:center;padding:28px 14px;overflow-y:auto;
+  backdrop-filter:blur(2px);
+}
+.cert-modal-overlay.hidden{display:none;}
+.cert-modal-inner{
+  background:#fdfdfb;border-radius:14px;max-width:700px;width:100%;padding:18px 18px 20px;
+  position:relative;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);
+}
+.cert-modal-close{
+  position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);cursor:pointer;font-size:15px;color:var(--ink-soft);z-index:2;
+  display:flex;align-items:center;justify-content:center;
+}
+.cert-modal-close:hover{color:var(--bad);border-color:var(--bad);}
+.cert-modal-actions{display:flex;gap:9px;margin-top:14px;}
+.cert-modal-actions .btn{flex:1;}
+
+/* -- landscape certificate card, gold ornamental style -- */
+#certificate{ display:block; }
+.cert-card{
+  position:relative;overflow:hidden;
+  aspect-ratio:1.5/1;width:100%;
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(201,116,15,.05), transparent 45%),
+    radial-gradient(ellipse at 88% 92%, rgba(201,116,15,.05), transparent 45%),
+    #fffdfa;
+  border:1px solid #e7d9bf;
+  box-shadow:inset 0 0 0 6px #fff, inset 0 0 0 7px #d9b06a;
+  display:flex;align-items:center;justify-content:center;
+  padding:6%;
+}
+.cert-corner-orn{position:absolute;width:44%;max-width:280px;height:auto;pointer-events:none;}
+.cert-corner-orn.tl{top:-6%;left:-6%;}
+.cert-corner-orn.tr{top:-6%;right:-6%;transform:scaleX(-1);}
+.cert-corner-orn.br{bottom:-8%;right:-8%;width:30%;max-width:190px;transform:rotate(180deg);opacity:.85;}
+
+.cert-serial-sm{
+  position:absolute;top:4%;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:9px;
+  color:#8a7a5e;letter-spacing:.02em;z-index:2;white-space:nowrap;
+}
+.cert-content{position:relative;z-index:2;text-align:center;max-width:82%;}
+.cert-title-lg{
+  font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(22px,4.2vw,34px);
+  letter-spacing:.06em;color:#1a1a1a;line-height:1;margin:0;
+}
+.cert-subtitle-lg{
+  font-family:var(--font-mono);font-size:clamp(8.5px,1.3vw,10.5px);letter-spacing:.32em;
+  color:#8a5a0f;margin:7px 0 0;text-transform:uppercase;
+}
+.cert-presented{
+  font-family:var(--font-body);font-size:clamp(9px,1.4vw,11.5px);letter-spacing:.12em;
+  color:#5a5a5a;text-transform:uppercase;margin:22px 0 6px;
+}
+.cert-name-lg{
+  font-family:"Dancing Script",cursive;font-weight:700;font-size:clamp(26px,5.5vw,42px);
+  color:#1a1a1a;margin:2px 0 4px;line-height:1.15;
+}
+.cert-name-lg::after{
+  content:"";display:block;width:58%;max-width:320px;margin:6px auto 0;border-bottom:1.5px solid #1a1a1a;
+}
+.cert-ribbon-wrap{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px auto 16px;}
+.cert-dots{color:#c9740f;font-size:11px;letter-spacing:3px;flex-shrink:0;}
+.cert-ribbon{
+  background:#1a1a1a;color:#fff;font-family:var(--font-mono);font-weight:600;
+  font-size:clamp(9.5px,1.5vw,12px);letter-spacing:.06em;padding:8px 26px;
+  clip-path:polygon(3% 0%,97% 0%,100% 50%,97% 100%,3% 100%,0% 50%);
+  white-space:nowrap;
+}
+.cert-desc{
+  font-family:var(--font-body);font-size:clamp(8.5px,1.25vw,10.5px);color:#5a5a5a;
+  line-height:1.6;max-width:480px;margin:0 auto;
+}
+.cert-desc b{color:#1a1a1a;font-weight:700;}
+.cert-bottom-row{
+  display:flex;justify-content:space-between;gap:30px;margin-top:clamp(18px,4vw,34px);
+  max-width:480px;margin-left:auto;margin-right:auto;
+}
+.cert-bottom-item{flex:1;text-align:center;}
+.cert-bottom-line{display:block;border-bottom:1px solid #1a1a1a;height:1px;margin-bottom:6px;}
+.cert-bottom-lab{
+  font-family:var(--font-mono);font-size:clamp(7.5px,1.1vw,9.5px);letter-spacing:.1em;color:#5a5a5a;
+  text-transform:uppercase;
+}
+
+@media (max-width:520px){
+  .cert-card{aspect-ratio:auto;padding:9% 5%;}
+  .cert-corner-orn{width:56%;}
+  .cert-bottom-row{flex-direction:row;gap:14px;}
+}
+
+@media print{
+  body *{visibility:hidden;}
+  #certificate, #certificate *{visibility:visible;}
+  .cert-modal-overlay{position:static;background:none;padding:0;display:block;backdrop-filter:none;}
+  .cert-modal-inner{box-shadow:none;padding:0;max-width:none;}
+  .cert-modal-close, .cert-modal-actions{display:none;}
+  #certificate{
+    position:absolute;top:0;left:0;width:100%;padding:20px;
+  }
+  @page{ size:landscape; }
+}
+
+/* ---------- footer ---------- */
+.site-footer{
+  max-width:760px;margin:0 auto;padding:8px 16px 24px;text-align:center;
+  font-size:11px;color:var(--ink-soft);
+}
+.site-footer .mono{color:var(--ink-soft);}
+.credit{
+  text-align:center;margin:18px auto 6px;font-family:var(--font-display);font-size:13px;
+  font-weight:600;color:var(--ink-soft);
+}
+.credit a{color:var(--accent-ink);text-decoration:none;border-bottom:1.5px solid var(--accent);}
+.credit a:hover{color:var(--accent);}
+
+/* ---------- confetti ---------- */
+.confetti-piece{
+  position:fixed;top:-12px;width:8px;height:14px;z-index:999;pointer-events:none;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  to{transform:translateY(112vh) rotate(540deg);opacity:.9;}
+}
+
+@media (max-width:560px){
+  .class-grid{grid-template-columns:1fr;}
+  .review-grid{grid-template-columns:repeat(5,1fr);}
+  .card{padding:18px;}
+  .quiz-actions{flex-wrap:wrap;}
+  .quiz-actions .btn{flex:1 1 auto;}
+  .quiz-actions .btn-finish{order:3;flex-basis:100%;}
+  .result-summary{grid-template-columns:repeat(3,1fr);}
+  .gauge-wrap{width:150px;height:150px;}
+  .nav-dot{width:20px;height:20px;font-size:8.5px;}
+}
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="chrome-bar">
+    <div class="chrome-dots"><span></span><span></span><span></span></div>
+    <div class="chrome-title mono" id="chrome-title">olimpiada_informatika.run</div>
+    <button class="theme-toggle" id="theme-toggle" title="Mavzuni almashtirish" aria-label="Mavzuni almashtirish">◐</button>
+  </div>
+  <div class="chrome-fill"></div>
+</div>
+
+<div class="wrap">
+
+  <div class="brand-row">
+    <h1>Olimpiadaga tayyorlanish</h1>
+    <span class="subject-tag mono">informatika · maktab bosqichi</span>
+  </div>
+
+  <!-- ============ START SCREEN ============ -->
+  <section id="screen-start">
+    <div class="card">
+      <label class="field-label" for="student-name">F.I.O. (Familiya Ism Sharifi)</label>
+      <input class="text-input" id="student-name" type="text" placeholder="Masalan: Muhammadjon Mammatjumayev" autocomplete="off">
+
+      <label class="field-label">Sinfni tanlang</label>
+      <div class="class-grid" id="class-grid">
+        <div class="class-btn" data-grade="9">9-sinf<span>Informatika va AT</span><span class="check">✓</span></div>
+        <div class="class-btn" data-grade="10">10-sinf<span>Informatika va AT</span><span class="check">✓</span></div>
+        <div class="class-btn" data-grade="11">11-sinf<span>Informatika va AT</span><span class="check">✓</span></div>
+      </div>
+
+      <div class="info-box">
+        <span class="ico">i</span>
+        <span>
+          Test <b>36 ta savol</b>dan iborat: 1–12 — 0,9 ball, 13–24 — 1,5 ball, 25–36 — 2,6 ball. Jami maksimal ball: <b>60</b>.
+          Savollar 180 talik bazadan har urinishda tasodifiy tanlanadi va aralashtiriladi — natijada har safar boshqacha test chiqadi.
+          Vaqt chegarasi: <b>40 daqiqa</b>.
+          <span class="tier-legend">
+            <span class="lg"><span class="dot" style="background:var(--amber)"></span>0,9 ball</span>
+            <span class="lg"><span class="dot" style="background:var(--accent)"></span>1,5 ball</span>
+            <span class="lg"><span class="dot" style="background:var(--good)"></span>2,6 ball</span>
+          </span>
+        </span>
+      </div>
+
+      <div class="hint-err" id="start-error"></div>
+      <button class="primary-btn" id="start-btn">Testni boshlash →</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ SCREEN ============ -->
+  <section id="screen-quiz" class="hidden">
+    <div class="card">
+      <div class="quiz-head">
+        <div class="who">F.I.O.: <b id="quiz-name"></b> &nbsp;·&nbsp; Sinf: <b id="quiz-grade"></b></div>
+        <div class="head-right">
+          <div class="timer-chip mono" id="timer-chip">⏱ 40:00</div>
+          <div class="progress-pill" id="progress-pill">01 / 36</div>
+        </div>
+      </div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width:2.77%"></div></div>
+
+      <div class="nav-grid" id="nav-grid"></div>
+
+      <div class="q-top-row">
+        <span id="q-ball-tag" class="q-ball-tag"></span>
+        <button class="flag-btn" id="flag-btn">⚑ Belgilash</button>
+      </div>
+
+      <div id="question-panel">
+        <div id="q-text" class="q-text"></div>
+        <div id="q-table-holder"></div>
+        <div id="q-options" class="options"></div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn" id="btn-prev">← Oldingi</button>
+        <button class="btn" id="btn-next">Keyingi →</button>
+        <button class="btn btn-finish" id="btn-finish">Yakunlash</button>
+      </div>
+    </div>
+    <div class="site-footer">Klaviatura: <span class="mono">← →</span> — savol almashtirish, <span class="mono">A–D</span> — javob tanlash</div>
+  </section>
+
+  <!-- ============ REVIEW SCREEN (before submit) ============ -->
+  <section id="screen-review" class="hidden">
+    <div class="card">
+      <h1 style="font-size:16px;font-family:var(--font-display);margin:0 0 4px;">Testni yakunlashdan oldin</h1>
+      <p class="review-summary-line">Javob berilgan: <b id="rv-answered"></b> / 36 &nbsp;·&nbsp; Belgilangan: <b id="rv-flagged"></b></p>
+      <div class="review-legend">
+        <span class="lg"><span class="sw" style="background:var(--good-soft);border:1.5px solid var(--good)"></span>Javob berilgan</span>
+        <span class="lg"><span class="sw" style="background:var(--bad-soft);border:1.5px solid var(--bad)"></span>Javobsiz</span>
+        <span class="lg"><span class="sw" style="background:var(--flag);border-radius:50%;width:8px;height:8px;"></span>Belgilangan</span>
+      </div>
+      <div class="review-grid" id="review-grid"></div>
+      <div class="quiz-actions">
+        <button class="btn" id="btn-back-to-quiz">← Testga qaytish</button>
+        <button class="btn btn-finish" id="btn-confirm-finish">Ha, yakunlayman</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <section id="screen-result" class="hidden">
+    <div class="card">
+      <div class="score-hero">
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 172 172" width="172" height="172">
+            <circle class="gauge-bg" cx="86" cy="86" r="74"></circle>
+            <circle class="gauge-fill" id="gauge-fill" cx="86" cy="86" r="74"
+              stroke-dasharray="465" stroke-dashoffset="465"></circle>
+          </svg>
+          <div class="gauge-center">
+            <div class="pct" id="res-percent">0%</div>
+            <div class="lab" id="res-scoreline">0 / 60 ball</div>
+          </div>
+        </div>
+        <div class="verdict" id="res-verdict"></div>
+      </div>
+
+      <div class="result-summary">
+        <div class="stat"><div class="num" id="res-correct">0/36</div><div class="lab">To'g'ri javob</div></div>
+        <div class="stat"><div class="num" id="res-time">00:00</div><div class="lab">Sarflangan vaqt</div></div>
+        <div class="stat"><div class="num" id="res-grade-disp">–</div><div class="lab">Sinf</div></div>
+      </div>
+
+      <div class="tier-breakdown">
+        <h3>Daraja bo'yicha natija</h3>
+        <div class="tier-row"><span class="tname">0,9 ball (1–12)</span><div class="tbar"><div class="tbar-fill" id="tb1" style="width:0%;background:var(--amber)"></div></div><span class="tval" id="tb1v">0/12</span></div>
+        <div class="tier-row"><span class="tname">1,5 ball (13–24)</span><div class="tbar"><div class="tbar-fill" id="tb2" style="width:0%"></div></div><span class="tval" id="tb2v">0/12</span></div>
+        <div class="tier-row"><span class="tname">2,6 ball (25–36)</span><div class="tbar"><div class="tbar-fill" id="tb3" style="width:0%;background:var(--good)"></div></div><span class="tval" id="tb3v">0/12</span></div>
+      </div>
+
+      <div class="result-table-wrap">
+        <table class="result-table">
+          <thead><tr><th>#</th><th>Ball</th><th>Natija</th></tr></thead>
+          <tbody id="res-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn" id="btn-print-cert">🏅 Sertifikatni ko'rish</button>
+        <button class="btn btn-finish" id="btn-restart">Qayta boshlash</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-footer">Har bir urinishda savollar 252 talik bazadan tasodifiy tanlanadi — javoblar ataylab ko'rsatilmaydi, faqat natija.</div>
+  <h3 class="credit">Created By <a href="https://github.com/Muhammadjon011" target="_blank" rel="noopener">Muhammadjon</a></h3>
+</div>
+
+<!-- certificate: on-screen preview modal + print target -->
+<div class="cert-modal-overlay hidden" id="cert-modal-overlay">
+  <div class="cert-modal-inner">
+    <button class="cert-modal-close" id="cert-modal-close" aria-label="Yopish">✕</button>
+
+    <div id="certificate">
+      <div class="cert-card">
+        <!-- original corner flourish ornaments (SVG) -->
+        <svg class="cert-corner-orn tl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(28,28)">
+            <g>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(0)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(40)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(80)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(120)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(160)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(200)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(240)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(280)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(320)"/>
+            </g>
+            <circle r="13" fill="#8a5a0f"/>
+            <circle r="6" fill="#fff3e0"/>
+          </g>
+          <g transform="translate(78,78) scale(0.5)">
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.3" transform="rotate(0)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.28" transform="rotate(60)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.3" transform="rotate(120)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.28" transform="rotate(180)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.3" transform="rotate(240)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.28" transform="rotate(300)"/>
+            <circle r="10" fill="#8a5a0f" opacity="0.7"/>
+          </g>
+          <circle cx="108" cy="108" r="4" fill="#c9740f" opacity="0.4"/>
+          <circle cx="128" cy="122" r="2.6" fill="#c9740f" opacity="0.3"/>
+          <circle cx="145" cy="136" r="1.8" fill="#c9740f" opacity="0.22"/>
+        </svg>
+        <svg class="cert-corner-orn tr" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(28,28)">
+            <g>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(0)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(40)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(80)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(120)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(160)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(200)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(240)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.4" transform="rotate(280)"/>
+              <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.45" transform="rotate(320)"/>
+            </g>
+            <circle r="13" fill="#8a5a0f"/>
+            <circle r="6" fill="#fff3e0"/>
+          </g>
+          <g transform="translate(78,78) scale(0.5)">
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.3" transform="rotate(0)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.28" transform="rotate(60)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.3" transform="rotate(120)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.28" transform="rotate(180)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#c9740f" opacity="0.3" transform="rotate(240)"/>
+            <ellipse cx="0" cy="-44" rx="15" ry="44" fill="#e0a23d" opacity="0.28" transform="rotate(300)"/>
+            <circle r="10" fill="#8a5a0f" opacity="0.7"/>
+          </g>
+          <circle cx="108" cy="108" r="4" fill="#c9740f" opacity="0.4"/>
+          <circle cx="128" cy="122" r="2.6" fill="#c9740f" opacity="0.3"/>
+          <circle cx="145" cy="136" r="1.8" fill="#c9740f" opacity="0.22"/>
+        </svg>
+        <svg class="cert-corner-orn br" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(28,28)">
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#c9740f" opacity="0.32" transform="rotate(0)"/>
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#e0a23d" opacity="0.28" transform="rotate(50)"/>
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#c9740f" opacity="0.32" transform="rotate(100)"/>
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#e0a23d" opacity="0.28" transform="rotate(150)"/>
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#c9740f" opacity="0.32" transform="rotate(200)"/>
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#e0a23d" opacity="0.28" transform="rotate(250)"/>
+            <ellipse cx="0" cy="-40" rx="13" ry="40" fill="#c9740f" opacity="0.32" transform="rotate(300)"/>
+            <circle r="10" fill="#8a5a0f" opacity="0.6"/>
+          </g>
+        </svg>
+
+        <div class="cert-serial-sm">№ <span id="cert-serial-num">—</span></div>
+
+        <div class="cert-content">
+          <div class="cert-title-lg">SERTIFIKAT</div>
+          <div class="cert-subtitle-lg">Ishtirok va natija uchun</div>
+          <div class="cert-presented">Ushbu sertifikat quyidagi o'quvchiga taqdim etiladi</div>
+          <div class="cert-name-lg" id="cert-name">Ism Familiya</div>
+
+          <div class="cert-ribbon-wrap">
+            <span class="cert-dots">• • •</span>
+            <span class="cert-ribbon" id="cert-ribbon-text">9-SINF · 0% NATIJA</span>
+            <span class="cert-dots">• • •</span>
+          </div>
+
+          <div class="cert-desc">
+            Informatika va axborot texnologiyalari fanidan maktab bosqichi olimpiadasiga tayyorgarlik
+            sinovida qatnashib, <b id="cert-score">0 / 60 ball</b> to'plagani va
+            <b id="cert-verdict-mini">natija</b> ko'rsatgani uchun taqdim etiladi.
+          </div>
+
+          <div class="cert-bottom-row">
+            <div class="cert-bottom-item">
+              <span class="cert-bottom-line"></span>
+              <span class="cert-bottom-lab">Sana — <span id="cert-date"></span></span>
+            </div>
+            <div class="cert-bottom-item">
+              <span class="cert-bottom-line"></span>
+              <span class="cert-bottom-lab">Imzo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cert-modal-actions">
+      <button class="btn" id="cert-modal-close-2">Yopish</button>
+      <button class="btn btn-finish" id="btn-print-cert-modal">🖨 Chop etish / PDF saqlash</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTION_BANK = {"9":{"tiers":[{"ball":0.9,"questions":[{"ball":0.9,"text":["Quyidagi qurilmalardan qaysi biri chiqarish qurilmasi (output device) hisoblanadi?"],"correct":"A","options":{"A":"Monitor","B":"Klaviatura","C":"Skaner","D":"Sichqoncha"}},{"ball":0.9,"text":["Qaysi kengaytma matnli hujjat fayliga tegishli?"],"correct":"B","options":{"A":"*.mp3","B":"*.docx","C":"*.jpg","D":"*.exe"}},{"ball":0.9,"text":["Quyidagi manzillardan qaysi biri kompyuterdagi fayl manzili (path) hisoblanadi?"],"correct":"C","options":{"A":"http://uzinfocom.uz","B":"info@mail.uz","C":"C:\\Fayllar\\hujjat.docx","D":"192.168.1.1"}},{"ball":0.9,"text":["Quyidagi kengaytmalardan qaysi biri faqat rasm fayliga tegishli?"],"correct":"D","options":{"A":".mp4","B":".txt","C":".exe","D":".png"}},{"ball":0.9,"text":["Quyidagi algoritm bajarildi:","1. Boshlash","2. A = 5, B = 3 kiritildi","3. Agar A > B bo'lsa → A + B chiqarish","    Aks holda → A − B chiqarish","4. Tugatish","Algoritm qaysi sonni chiqaradi?"],"correct":"A","options":{"A":"8","B":"2","C":"15","D":"3"}},{"ball":0.9,"text":["Quyidagilardan qaysi biri tizim dasturiy ta'minotiga misol bo'ladi?"],"correct":"B","options":{"A":"MS Word","B":"Windows 10","C":"Telegram","D":"Photoshop"}},{"ball":0.9,"text":["3 GB necha MB ga teng?"],"correct":"C","options":{"A":"3000 MB","B":"3200 MB","C":"3072 MB","D":"1024 MB"}},{"ball":0.9,"text":["Instagramga bitta rasm yuklash uchun o'rtacha 5 MB internet trafik sarflanadi.","Agar bir kunda 6 ta rasm yuklansa, qancha MB internet trafik sarflanadi?"],"correct":"D","options":{"A":"25","B":"35","C":"40","D":"30"}},{"ball":0.9,"text":["Matn Sezar (Caesar) shifri bo'yicha shifrlangan.","Shifrlangan matn: IFMMP","Kalit: 1","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Deshifrlab asl matnni aniqlang."],"correct":"A","options":{"A":"HELLO","B":"HELPO","C":"HELLP","D":"HFLLO"}},{"ball":0.9,"text":["Faqat xotira qurilmalar berilgan javobni toping.","1) CPU  2) RAM  3) Monitor  4) SSD  5) Klaviatura  6) ROM"],"correct":"B","options":{"A":"1, 3, 5","B":"2, 4, 6","C":"1, 2, 4","D":"3, 5, 6"}},{"ball":0.9,"text":["Quyidagi qurilmalardan qaysi biri kiritish qurilmasi hisoblanadi?"],"correct":"C","options":{"C":"Klaviatura","A":"Monitor","B":"Printer","D":"Proyektor"}},{"ball":0.9,"text":["Qaysi kengaytma audio fayliga tegishli?"],"correct":"D","options":{"D":".mp3","A":".png","B":".docx","C":".exe"}},{"ball":0.9,"text":["Quyidagilardan qaysi biri IP manzil misoliga to'g'ri keladi?"],"correct":"A","options":{"A":"192.168.1.1","B":"www.uz","C":"C:\\Windows","D":"test.txt"}},{"ball":0.9,"text":["Quyidagi kengaytmalardan qaysi biri faqat video fayliga tegishli?"],"correct":"B","options":{"B":".mp4","A":".jpg","C":".mp3","D":".txt"}},{"ball":0.9,"text":["Quyidagi algoritm bajarildi:","1. Boshlash","2. A = 10, B = 4 kiritildi","3. Agar A > B bo'lsa → A − B chiqarish","    Aks holda → A + B chiqarish","4. Tugatish","Algoritm qaysi sonni chiqaradi?"],"correct":"C","options":{"C":"6","A":"14","B":"10","D":"4"}},{"ball":0.9,"text":["Quyidagilardan qaysi biri tizim dasturiy ta'minotiga misol bo'ladi?"],"correct":"D","options":{"D":"Linux","A":"MS Word","B":"Telegram","C":"Chrome"}},{"ball":0.9,"text":["2 GB necha MB ga teng?"],"correct":"A","options":{"A":"2048 MB","B":"2000 MB","C":"2100 MB","D":"1024 MB"}},{"ball":0.9,"text":["Bitta rasm 3 MB hajmga ega. 10 ta rasm yuklansa, qancha MB internet trafik sarflanadi?"],"correct":"B","options":{"B":"30","A":"20","C":"25","D":"35"}},{"ball":0.9,"text":["Matn Sezar (Caesar) shifri bo'yicha shifrlangan.","Shifrlangan matn: EPH","Kalit: 1","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Deshifrlab asl matnni aniqlang."],"correct":"C","options":{"C":"DOG","A":"DOF","B":"EOG","D":"DPG"}},{"ball":0.9,"text":["Faqat asosiy (ichki) xotira qurilmalar berilgan javobni toping.","1) HDD  2) RAM  3) Printer  4) ROM  5) Sichqoncha  6) SSD"],"correct":"D","options":{"D":"2, 4","A":"1, 6","B":"3, 5","C":"2, 6"}},{"text":["Fayl kengaytmasi (extension) nimani bildiradi?"],"correct":"D","options":{"A":"Fayl hajmini","B":"Fayl egasini","C":"Fayl joylashgan diskni","D":"Fayl turini (formatini)"},"ball":0.9},{"text":["1 bayt nechta bitdan iborat?"],"correct":"B","options":{"A":"4","B":"8","C":"16","D":"2"},"ball":0.9},{"text":["Quyidagilardan qaysi biri operatsion tizimga misol bo'ladi?"],"correct":"C","options":{"A":"MS Excel","B":"Skype","C":"Android","D":"Photoshop"},"ball":0.9},{"text":["Quyidagi algoritm bajarildi:","1. Boshlash","2. A = 8, B = 6 kiritildi","3. Agar A > B bo'lsa → A − B chiqarish","    Aks holda → A + B chiqarish","4. Tugatish","Algoritm qaysi sonni chiqaradi?"],"correct":"B","options":{"A":"14","B":"2","C":"48","D":"6"},"ball":0.9},{"text":["5 GB necha MB ga teng?"],"correct":"A","options":{"A":"5120 MB","B":"5000 MB","C":"5100 MB","D":"1024 MB"},"ball":0.9},{"text":["Instagramga bitta video yuklash uchun o'rtacha 12 MB internet trafik sarflanadi.","Agar bir kunda 4 ta video yuklansa, qancha MB internet trafik sarflanadi?"],"correct":"D","options":{"A":"36","B":"40","C":"44","D":"48"},"ball":0.9},{"text":["Matn Sezar (Caesar) shifri bo'yicha shifrlangan.","Shifrlangan matn: PDVWHU","Kalit: 3","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Deshifrlab asl matnni aniqlang."],"correct":"A","options":{"A":"MASTER","B":"MASTED","C":"NASTER","D":"MASTOR"},"ball":0.9},{"text":["Faqat kiritish qurilmalari berilgan javobni toping.","1) Klaviatura  2) Monitor  3) Skaner  4) Printer  5) Mikrofon  6) Proyektor"],"correct":"A","options":{"A":"1, 3, 5","B":"2, 4, 6","C":"1, 2, 4","D":"3, 5, 6"},"ball":0.9}]},{"ball":1.5,"questions":[{"ball":1.5,"text":["Noma'lum x ni toping.","x2₅ = 12₁₀"],"correct":"C","options":{"A":"1","B":"3","C":"2","D":"0"}},{"ball":1.5,"text":["Agar A=1, B=1 va C=0 bo'lsa, quyidagi mantiqiy ifodaning natijasini aniqlang:","(A AND B) OR C"],"correct":"D","options":{"A":"0","B":"A","C":"C","D":"1"}},{"ball":1.5,"text":["Quyidagi kod natijasini aniqlang.","P = 1","for i in range(1, 5):","    P = P * i","print(P)"],"correct":"A","options":{"A":"24","B":"10","C":"16","D":"0"}},{"ball":1.5,"text":["MS Excel jadvalda A1=4, A2=8, A3=12.","=SUM(A1:A3)/MIN(A1:A2)","formula natijasini hisoblang."],"correct":"B","options":{"A":"8","B":"6","C":"3","D":"24"}},{"ball":1.5,"text":["Quyidagi misollardan qaysi biri Birga-bir (One-to-One) munosabatiga mos keladi?"],"correct":"C","options":{"A":"Talaba ↔ Kitoblar","B":"Mijoz ↔ Buyurtmalar","C":"Xodim ↔ Pasport ma'lumotlari","D":"O'qituvchi ↔ Sinflar"}},{"ball":1.5,"text":["RGB tizimida qora rang qanday kodlanadi?"],"correct":"D","options":{"A":"(255, 255, 255)","B":"(255, 0, 0)","C":"(0, 255, 0)","D":"(0, 0, 0)"}},{"ball":1.5,"text":["Video 1 daqiqa davom etadi, har sekundda 24 ta kadr ko'rsatiladi.","Umumiy kadrlar soni qancha?"],"correct":"A","options":{"A":"1440","B":"1200","C":"2400","D":"720"}},{"ball":1.5,"text":["IPv4 manzil nechta qismdan (oktetdan) iborat?"],"correct":"B","options":{"A":"2","B":"4","C":"8","D":"16"}},{"ball":1.5,"text":["Modellashtirish nima?"],"correct":"C","options":{"A":"Dasturlash tili","B":"Fayllarni arxivlash jarayoni","C":"Haqiqiy obyektning soddalashtirilgan nusxasini yaratish","D":"Tarmoqqa ulanish jarayoni"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri HTML formasida ma'lumotni URL orqali ochiq ko'rinishda serverga yuborish usuli?"],"correct":"D","options":{"A":"POST","B":"DELETE","C":"PUT","D":"GET"}},{"ball":1.5,"text":["Noma'lum x ni toping.","x1₅ = 6₁₀"],"correct":"A","options":{"A":"1","B":"0","C":"2","D":"3"}},{"ball":1.5,"text":["Agar A=0, B=1 va C=1 bo'lsa, quyidagi mantiqiy ifodaning natijasini aniqlang:","(A OR B) AND C"],"correct":"B","options":{"A":"0","B":"1","C":"A","D":"C"}},{"ball":1.5,"text":["Quyidagi kod natijasini aniqlang.","P = 2","for i in range(1, 4):","    P = P * i","print(P)"],"correct":"C","options":{"C":"12","A":"6","B":"24","D":"2"}},{"ball":1.5,"text":["MS Excel jadvalda A1=10, A2=5, A3=2.","=SUM(A1:A3) − MAX(A1:A3)","formula natijasini hisoblang."],"correct":"D","options":{"D":"7","A":"17","B":"10","C":"5"}},{"ball":1.5,"text":["Quyidagi misollardan qaysi biri Birga-bir (One-to-One) munosabatiga mos keladi?"],"correct":"A","options":{"A":"Fuqaro ↔ Pasport","B":"O'qituvchi ↔ Sinflar","C":"Kitob ↔ Mualliflar","D":"Talaba ↔ Fanlar"}},{"ball":1.5,"text":["RGB tizimida (0, 255, 0) qaysi rangga to'g'ri keladi?"],"correct":"B","options":{"A":"Qizil","B":"Yashil","C":"Ko'k","D":"Oq"}},{"ball":1.5,"text":["Video 2 daqiqa davom etadi, har sekundda 25 ta kadr ko'rsatiladi.","Umumiy kadrlar soni qancha?"],"correct":"C","options":{"C":"3000","A":"1500","B":"6000","D":"2500"}},{"ball":1.5,"text":["IPv4 manzil umumiy nechta bitdan iborat?"],"correct":"D","options":{"D":"32","A":"16","B":"64","C":"8"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri modellashtirishga (Yer globusi) misol bo'ladi?"],"correct":"A","options":{"A":"Yer globusi","B":"Video o'yin","C":"Rasm chizish","D":"Fayl nusxalash"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri HTML formasida ma'lumotni yashirin holda (body ichida) serverga yuborish usuli?"],"correct":"B","options":{"A":"GET","B":"POST","C":"HEAD","D":"PUT"}},{"text":["Noma'lum x ni toping.","x1₅ = 11₁₀"],"correct":"B","options":{"A":"1","B":"2","C":"3","D":"4"},"ball":1.5},{"text":["Agar A=0, B=1 va C=1 bo'lsa, quyidagi mantiqiy ifodaning natijasini aniqlang:","(A OR B) AND C"],"correct":"D","options":{"A":"0","B":"A","C":"C","D":"1"},"ball":1.5},{"text":["Quyidagi kod natijasini aniqlang.","P = 1","for i in range(1, 6):","    P = P * i","print(P)"],"correct":"A","options":{"A":"120","B":"24","C":"60","D":"0"},"ball":1.5},{"text":["MS Excel jadvalda A1=6, A2=12, A3=18.","=SUM(A1:A3)/MAX(A1:A2)","formula natijasini hisoblang."],"correct":"A","options":{"A":"3","B":"6","C":"36","D":"12"},"ball":1.5},{"text":["Quyidagi misollardan qaysi biri Ko'p-ko'p (Many-to-Many) munosabatiga mos keladi?"],"correct":"B","options":{"A":"Xodim ↔ Pasport","B":"Talaba ↔ Fanlar","C":"Mamlakat ↔ Poytaxt","D":"Shaxs ↔ Tug'ilgan sana"},"ball":1.5},{"text":["RGB tizimida oq rang qanday kodlanadi?"],"correct":"D","options":{"A":"(0, 0, 0)","B":"(255, 0, 0)","C":"(0, 255, 0)","D":"(255, 255, 255)"},"ball":1.5},{"text":["Video 3 daqiqa davom etadi, har sekundda 30 ta kadr ko'rsatiladi.","Umumiy kadrlar soni qancha?"],"correct":"A","options":{"A":"5400","B":"1800","C":"3600","D":"9000"},"ball":1.5},{"text":["Quyidagilardan qaysi biri HTML formasida ma'lumotni ochiq (URL orqali) emas,","yashirin holda serverga yuborish usuli?"],"correct":"B","options":{"A":"GET","B":"POST","C":"HEAD","D":"OPTIONS"},"ball":1.5}]},{"ball":2.6,"questions":[{"ball":2.6,"text":["SQLda jadvaldan barcha ma'lumotlarni olish uchun qaysi buyruq ishlatiladi?"],"correct":"A","options":{"A":"SELECT","B":"INSERT","C":"DELETE","D":"UPDATE"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","text = \"salom dunyo\"","count = 0","for ch in text:","    if ch == \"o\":","        count += 1","print(count)"],"correct":"B","options":{"A":"1","B":"2","C":"3","D":"0"}},{"ball":2.6,"text":["Algoritm natijasini aniqlang: S = 0, i = 1 dan boshlanadi.","i <= 4 bo'lguncha: S = S + i, so'ng i = i + 1.","Sikl tugagach S ning qiymati nechaga teng bo'ladi?"],"correct":"C","options":{"A":"6","B":"4","C":"10","D":"15"}},{"ball":2.6,"text":["MS Accessda quyidagi jadval yaratilgan.","Criteria (Условия) qatoriga quyidagi shart yozilgan bo'lsa, so'rov natijasini aniqlang:","Yoshi > 17 AND Shahar = \"Toshkent\""],"correct":"D","table":{"headers":["ID","Ism","Familiya","Yoshi","Shahar"],"rows":[["1","Ali","Karimov","18","Toshkent"],["2","Vali","Nazarov","19","Samarqand"],["3","Dilnoza","Yusupova","21","Buxoro"],["4","Sardor","Qodirov","15","Toshkent"]]},"optionTables":{"A":{"headers":["ID","Ism","Familiya","Yoshi","Shahar"],"rows":[["1","Ali","Karimov","18","Toshkent"],["2","Vali","Nazarov","19","Samarqand"]]},"B":{"headers":["ID","Ism","Familiya","Yoshi","Shahar"],"rows":[["2","Vali","Nazarov","19","Samarqand"],["3","Dilnoza","Yusupova","21","Buxoro"]]},"C":{"headers":["ID","Ism","Familiya","Yoshi","Shahar"],"rows":[["3","Dilnoza","Yusupova","21","Buxoro"],["4","Sardor","Qodirov","15","Toshkent"]]},"D":{"headers":["ID","Ism","Familiya","Yoshi","Shahar"],"rows":[["1","Ali","Karimov","18","Toshkent"]]}}},{"ball":2.6,"text":["Hisoblang:","18 and 9 and 5"],"correct":"A","options":{"A":"5","B":"18","C":"9","D":"0"}},{"ball":2.6,"text":["150 MB fayl arxivlash natijasida 30% ga qisqardi.","Fayl necha MB bo'ldi?"],"correct":"B","options":{"A":"100","B":"105","C":"110","D":"120"}},{"ball":2.6,"text":["O'tkazishni bajaring:","12₁₀ → x₂"],"correct":"C","options":{"A":"1010","B":"1001","C":"1100","D":"1110"}},{"ball":2.6,"text":["Agar p = 1, q = 0 bo'lsa, quyidagi mantiqiy ifodalardan qaysi biri ROST?","1) p ∨ q","2) p ∧ q"],"correct":"D","options":{"A":"faqat 2","B":"1 va 2","C":"hech biri","D":"faqat 1"}},{"ball":2.6,"text":["MS Excelda A1=3, B1=5, C1=8.","=SUM(A1:C1) − MAX(A1:C1)","formula natijasini hisoblang."],"correct":"A","options":{"A":"8","B":"16","C":"5","D":"3"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","def hisob(a, b):","    return a + b * 2","x = hisob(3, 4)","print(x)"],"correct":"B","options":{"A":"14","B":"11","C":"7","D":"10"}},{"ball":2.6,"text":["SQLda jadvaldan ma'lum shart bo'yicha yozuvni o'chirish uchun qaysi buyruq ishlatiladi?"],"correct":"C","options":{"C":"DELETE","A":"SELECT","B":"INSERT","D":"UPDATE"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","text = \"python dasturlash\"","count = 0","for ch in text:","    if ch == \"a\":","        count += 1","print(count)"],"correct":"D","options":{"D":"2","A":"1","B":"3","C":"0"}},{"ball":2.6,"text":["Algoritm natijasini aniqlang: S = 0, i = 1 dan boshlanadi.","i <= 3 bo'lguncha: S = S + i*i, so'ng i = i + 1.","Sikl tugagach S ning qiymati nechaga teng bo'ladi?"],"correct":"A","options":{"A":"14","B":"6","C":"9","D":"0"}},{"ball":2.6,"text":["MS Accessda quyidagi jadval yaratilgan.","Criteria (Условия) qatoriga quyidagi shart yozilgan bo'lsa, so'rov natijasini aniqlang:","Yoshi >= 20 AND Shahar = \"Andijon\""],"correct":"B","table":{"headers":["ID","Ism","Yoshi","Shahar"],"rows":[["1","Vali","20","Andijon"],["2","Olim","17","Farg'ona"],["3","Aziz","22","Andijon"],["4","Kamol","19","Farg'ona"]]},"optionTables":{"B":{"headers":["ID","Ism","Yoshi","Shahar"],"rows":[["1","Vali","20","Andijon"],["3","Aziz","22","Andijon"]]},"A":{"headers":["ID","Ism","Yoshi","Shahar"],"rows":[["2","Olim","17","Farg'ona"],["4","Kamol","19","Farg'ona"]]},"C":{"headers":["ID","Ism","Yoshi","Shahar"],"rows":[["1","Vali","20","Andijon"],["2","Olim","17","Farg'ona"]]},"D":{"headers":["ID","Ism","Yoshi","Shahar"],"rows":[["3","Aziz","22","Andijon"],["4","Kamol","19","Farg'ona"]]}}},{"ball":2.6,"text":["Hisoblang:","7 and 0 and 9"],"correct":"C","options":{"C":"0","A":"7","B":"9","D":"1"}},{"ball":2.6,"text":["200 MB fayl arxivlash natijasida 40% ga qisqardi.","Fayl necha MB bo'ldi?"],"correct":"D","options":{"D":"120","A":"100","B":"140","C":"160"}},{"ball":2.6,"text":["O'tkazishni bajaring:","20₁₀ → x₂"],"correct":"A","options":{"A":"10100","B":"10010","C":"11000","D":"10001"}},{"ball":2.6,"text":["Agar p = 0, q = 1 bo'lsa, quyidagi mantiqiy ifodalardan qaysi biri ROST?","1) p ∨ q","2) p ∧ q"],"correct":"B","options":{"B":"faqat 1","A":"faqat 2","C":"ikkalasi ham","D":"hech biri"}},{"ball":2.6,"text":["MS Excelda A1=10, B1=2, C1=5.","=SUM(A1:C1) * MIN(B1:C1)","formula natijasini hisoblang."],"correct":"C","options":{"C":"34","A":"17","B":"10","D":"2"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","def f(a, b):","    return a * b + 1","x = f(3, 4)","print(x)"],"correct":"D","options":{"D":"13","A":"12","B":"7","C":"1"}},{"text":["SQLda jadvalga yangi yozuv qo'shish uchun qaysi buyruq ishlatiladi?"],"correct":"B","options":{"A":"SELECT","B":"INSERT","C":"DELETE","D":"UPDATE"},"ball":2.6},{"text":["Quyidagi kod natijasini aniqlang.","text = \"dasturlash asoslari\"","count = 0","for ch in text:","    if ch == \"a\":","        count += 1","print(count)"],"correct":"C","options":{"A":"2","B":"3","C":"4","D":"5"},"ball":2.6},{"text":["Algoritm natijasini aniqlang: S = 0, i = 1 dan boshlanadi.","i <= 5 bo'lguncha: S = S + i, so'ng i = i + 1.","Sikl tugagach S ning qiymati nechaga teng bo'ladi?"],"correct":"A","options":{"A":"15","B":"10","C":"20","D":"5"},"ball":2.6},{"text":["MS Accessda jadvallar orasidagi bog'lanishni ta'minlaydigan maydon qanday nomlanadi?"],"correct":"C","options":{"A":"Indeks","B":"Filtr","C":"Kalit maydon","D":"Forma"},"ball":2.6},{"text":["Hisoblang:","12 and 20 and 7"],"correct":"C","options":{"A":"12","B":"20","C":"7","D":"0"},"ball":2.6},{"text":["240 MB fayl arxivlash natijasida 25% ga qisqardi.","Fayl necha MB bo'ldi?"],"correct":"A","options":{"A":"180","B":"200","C":"210","D":"160"},"ball":2.6},{"text":["O'tkazishni bajaring:","27₁₀ → x₂"],"correct":"A","options":{"A":"11011","B":"11001","C":"10111","D":"11101"},"ball":2.6},{"text":["Agar p = 0, q = 1 bo'lsa, quyidagi mantiqiy ifodalardan qaysi biri ROST?","1) p ∨ q","2) p ∧ q"],"correct":"D","options":{"A":"faqat 2","B":"1 va 2","C":"hech biri","D":"faqat 1"},"ball":2.6}]}]},"10":{"tiers":[{"ball":0.9,"questions":[{"ball":0.9,"text":["Quyidagi qurilmalardan qaysi biri chiqarish qurilmasi (output device) hisoblanadi?"],"correct":"A","options":{"A":"Monitor","B":"Sichqoncha","C":"Klaviatura","D":"Skaner"}},{"ball":0.9,"text":["Quyidagi maska “a??.txt” qaysi fayl nomiga mos keladi?"],"correct":"B","options":{"A":"ab.txt","B":"abc.txt","C":"abcd.txt","D":"a1c2.txt"}},{"ball":0.9,"text":["Quyidagilardan qaysi biri domen nomi hisoblanadi?"],"correct":"C","options":{"A":"192.168.0.1","B":"C:\\Windows\\System32","C":"www.edu.uz","D":"http://192.168.1.1"}},{"ball":0.9,"text":["Quyidagi fayllardan qaysi biri video fayl hisoblanadi?"],"correct":"D","options":{"A":".wav","B":".aac","C":".flac","D":".mkv"}},{"ball":0.9,"text":["Quyidagi algoritm bajarildi:","1. Boshlash","2. S = 0, i = 1","3. i ≤ 5 bo'lguncha: agar i juft son bo'lsa → S = S + i, so'ng i = i + 1","4. S ni chiqarish","5. Tugatish","Natijada S ning qiymatini aniqlang."],"correct":"A","options":{"A":"6","B":"9","C":"15","D":"0"}},{"ball":0.9,"text":["Quyidagi kod natijasini aniqlang.","S = 0","i = 1","while i <= 6:","    if i % 2 == 0:","        S = S + i","    i = i + 1","print(S)"],"correct":"B","options":{"A":"9","B":"12","C":"21","D":"6"}},{"ball":0.9,"text":["20 GB hajmli fleshkaning fayl tizimi uchun 5% joy band qilingan.","Fayllar uchun necha GB joy qoladi?"],"correct":"C","options":{"A":"19,5","B":"20","C":"19","D":"18"}},{"ball":0.9,"text":["Siz 10 MB hajmdagi faylni 2 Mbit/s tezlikdagi internet orqali yubormoqchisiz.","Faylni yuborish uchun qancha vaqt ketadi?"],"correct":"D","options":{"A":"10 soniya","B":"20 soniya","C":"30 soniya","D":"40 soniya"}},{"ball":0.9,"text":["Kalit: 2","Shifrlanadigan matn: CAT","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Matn Sezar (Caesar) shifri usulida shifrlanganda natija qanday bo'ladi?"],"correct":"A","options":{"A":"ECV","B":"EDW","C":"DBU","D":"FCX"}},{"ball":0.9,"text":["Noma'lum x ni toping.","x3₅ = 13₁₀"],"correct":"B","options":{"A":"1","B":"2","C":"3","D":"4"}},{"ball":0.9,"text":["Quyidagi qurilmalardan qaysi biri chiqarish qurilmasi hisoblanadi?"],"correct":"C","options":{"C":"Printer","A":"Skaner","B":"Klaviatura","D":"Mikrofon"}},{"ball":0.9,"text":["Quyidagi maska “b*.pdf” qaysi fayl nomiga mos keladi?"],"correct":"D","options":{"D":"book.pdf","A":"abook.pdf","B":"b.doc","C":"best.txt"}},{"ball":0.9,"text":["Quyidagilardan qaysi biri domen nomi hisoblanadi?"],"correct":"A","options":{"A":"mail.uz","B":"D:\\Fayllar","C":"10.0.0.1","D":"http://10.0.0.1"}},{"ball":0.9,"text":["Quyidagi kengaytmalardan qaysi biri faqat rasm fayliga tegishli?"],"correct":"B","options":{"B":".bmp","A":".mp3","C":".exe","D":".mkv"}},{"ball":0.9,"text":["Quyidagi algoritm bajarildi:","1. Boshlash","2. A = 6, B = 9 kiritildi","3. Agar A < B bo'lsa → A * B chiqarish","    Aks holda → A + B chiqarish","4. Tugatish","Algoritm qaysi sonni chiqaradi?"],"correct":"C","options":{"C":"54","A":"15","B":"3","D":"6"}},{"ball":0.9,"text":["Quyidagilardan qaysi biri tizim dasturiy ta'minotiga misol bo'ladi?"],"correct":"D","options":{"D":"Ubuntu","A":"Excel","B":"Skype","C":"Paint"}},{"ball":0.9,"text":["4 GB necha MB ga teng?"],"correct":"A","options":{"A":"4096 MB","B":"4000 MB","C":"4200 MB","D":"1024 MB"}},{"ball":0.9,"text":["Bitta rasm 8 MB hajmga ega. 5 ta rasm yuklansa, qancha MB internet trafik sarflanadi?"],"correct":"B","options":{"B":"40","A":"30","C":"35","D":"45"}},{"ball":0.9,"text":["Kalit: 2","Shifrlangan matn: ECT","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Matn Sezar (Caesar) shifri usulida shifrlangan. Deshifrlab asl matnni aniqlang."],"correct":"C","options":{"C":"CAR","A":"CAT","B":"BAR","D":"CAP"}},{"ball":0.9,"text":["Noma'lum x ni toping.","x2₅ = 17₁₀"],"correct":"D","options":{"D":"3","A":"2","B":"4","C":"1"}},{"text":["Quyidagi maska “[X-Z]*.txt” qaysi fayl nomiga mos keladi?"],"correct":"A","options":{"A":"Xfile.txt","B":"Afile.txt","C":"Mfile.txt","D":"Bnote.txt"},"ball":0.9},{"text":["www.uzinfocom.uz manzilidagi ikkinchi darajali domenni aniqlang."],"correct":"C","options":{"A":"uz","B":"www","C":"uzinfocom","D":"com"},"ball":0.9},{"text":["Quyidagi fayllardan qaysi biri arxiv fayl hisoblanadi?"],"correct":"A","options":{"A":".zip","B":".txt","C":".png","D":".exe"},"ball":0.9},{"text":["Quyidagi kod natijasini aniqlang.","S = 0","i = 1","while i <= 8:","    if i % 3 == 0:","        S = S + i","    i = i + 1","print(S)"],"correct":"A","options":{"A":"9","B":"12","C":"6","D":"15"},"ball":0.9},{"text":["15 GB hajmli diskning 10% joyi tizim uchun band qilingan.","Fayllar uchun necha GB joy qoladi?"],"correct":"A","options":{"A":"13,5","B":"15","C":"14","D":"12"},"ball":0.9},{"text":["Siz 25 MB hajmdagi faylni 5 Mbit/s tezlikdagi internet orqali yubormoqchisiz.","Faylni yuborish uchun qancha vaqt ketadi?"],"correct":"B","options":{"A":"20 soniya","B":"40 soniya","C":"50 soniya","D":"25 soniya"},"ball":0.9},{"text":["Kalit: 2","Shifrlanadigan matn: DOG","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Matn Sezar (Caesar) shifri usulida shifrlanganda natija qanday bo'ladi?"],"correct":"A","options":{"A":"FQI","B":"FPI","C":"EQI","D":"FQH"},"ball":0.9},{"text":["Noma'lum x ni toping.","x2₅ = 22₁₀"],"correct":"B","options":{"A":"3","B":"4","C":"5","D":"2"},"ball":0.9}]},{"ball":1.5,"questions":[{"ball":1.5,"text":["Agar p=1, q=0, k=0 bo'lsa, quyidagi ifodaning natijasini aniqlang:","(p AND q) OR (NOT k)"],"correct":"C","options":{"A":"0","B":"p","C":"1","D":"k"}},{"ball":1.5,"text":["Quyidagilardan qaysilari faqat kiritish qurilmalari hisoblanadi?","1) Klaviatura  2) Printer  3) Skaner  4) Monitor  5) Mikrofon  6) Proyektor"],"correct":"D","options":{"A":"1, 2, 4","B":"2, 4, 6","C":"1, 2, 3","D":"1, 3, 5"}},{"ball":1.5,"text":["Quyidagilardan qaysilari amaliy dasturiy ta'minotga misol bo'ladi?","1) MS Excel  2) Telegram  3) Windows  4) Python interpretatori  5) Photoshop  6) Linux"],"correct":"A","options":{"A":"1, 2, 5","B":"1, 3, 6","C":"2, 4, 5","D":"3, 4, 6"}},{"ball":1.5,"text":["MS Excel jadvalda A1=8, B1=10.","=IF(AND(A1>5, B1<20), SUM(A1:B1), A1*B1)","formula natijasini hisoblang."],"correct":"B","options":{"A":"80","B":"18","C":"10","D":"8"}},{"ball":1.5,"text":["Quyidagi misollardan qaysi biri Birga-ko'p (One-to-Many) munosabatiga mos keladi?"],"correct":"C","options":{"A":"Shaxs ↔ Pasporti","B":"Mijoz ↔ Mijozning pasport ma'lumotlari","C":"Maktab ↔ O'quvchilar","D":"Talaba ↔ (bitta) ID raqami"}},{"ball":1.5,"text":["Quyidagi RGB rangni HEX ga aylantiring:","RGB = (255, 0, 0)"],"correct":"D","options":{"A":"#00FF00","B":"#0000FF","C":"#FFFF00","D":"#FF0000"}},{"ball":1.5,"text":["10 soniyalik mono (1 kanal) audio yozuv 8000 Hz, 8 bit formatda yozilgan.","Audio faylning hajmini (bayt) aniqlang."],"correct":"A","options":{"A":"80000","B":"8000","C":"640000","D":"10000"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri to'g'ri IPv4 manzil hisoblanadi?"],"correct":"B","options":{"A":"256.100.0.1","B":"192.168.1.1","C":"192.168.300.1","D":"192.168.1"}},{"ball":1.5,"text":["Haqiqiy obyektning kichraytirilgan yoki kattalashtirilgan nusxasi qaysi model turiga kiradi?"],"correct":"C","options":{"A":"Iqtisodiy model","B":"Matematik model","C":"Fizik (jismoniy) model","D":"Kompyuter modeli"}},{"ball":1.5,"text":["HTTP status kodi 200 nima ma'noni anglatadi?"],"correct":"D","options":{"A":"Server topilmadi","B":"Sahifa topilmadi","C":"Server xatosi","D":"So'rov muvaffaqiyatli bajarildi"}},{"ball":1.5,"text":["Agar p=1, q=1, k=1 bo'lsa, quyidagi ifodaning natijasini aniqlang:","(p AND q) OR (NOT k)"],"correct":"A","options":{"A":"1","B":"0","C":"p","D":"k"}},{"ball":1.5,"text":["Quyidagilardan qaysilari faqat kiritish qurilmalari hisoblanadi?","1) Skaner  2) Monitor  3) Mikrofon  4) Printer  5) Klaviatura  6) Proyektor"],"correct":"B","options":{"B":"1, 3, 5","A":"2, 4, 6","C":"1, 2, 3","D":"4, 5, 6"}},{"ball":1.5,"text":["Quyidagilardan qaysilari amaliy dasturiy ta'minotga misol bo'ladi?","1) Chrome  2) Windows  3) MS PowerPoint  4) Linux  5) GIMP  6) macOS"],"correct":"C","options":{"C":"1, 3, 5","A":"2, 4, 6","B":"1, 2, 3","D":"3, 4, 6"}},{"ball":1.5,"text":["MS Excel jadvalda A1=6, A2=4, B1=5.","=PRODUCT(A1:A2) − MIN(A1:B1)","formula natijasini hisoblang."],"correct":"D","options":{"D":"20","A":"24","B":"4","C":"9"}},{"ball":1.5,"text":["Sizning Access bazangizda “Xodimlar” jadvali bor: ID, FISH, Lavozim, Sana.","Har bir xodim unikal bo'lishi uchun qaysi maydonni birlamchi kalit sifatida tanlash eng to'g'ri bo'ladi?"],"correct":"A","options":{"A":"ID","B":"FISH","C":"Lavozim","D":"Sana"}},{"ball":1.5,"text":["HEX rang kodini RGB formatiga o'tkazing.","#00FF00"],"correct":"B","options":{"B":"(0, 255, 0)","A":"(255, 0, 0)","C":"(0, 0, 255)","D":"(255, 255, 0)"}},{"ball":1.5,"text":["Nechta foydalaniladigan xost IP mavjud?","IP: 192.168.2.0 / 28"],"correct":"C","options":{"C":"14","A":"16","B":"12","D":"8"}},{"ball":1.5,"text":["“H₂O” kimyoviy formulasi qaysi turdagi modelga kiradi?"],"correct":"D","options":{"D":"Belgili (simvolik) model","A":"Fizik model","B":"Grafik model","C":"Statistik model"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri dasturlash (backend) tili EMAS?"],"correct":"A","options":{"A":"CSS","B":"Node.js","C":"Django","D":"Laravel"}},{"ball":1.5,"text":["HTTP status kodi 500 nima ma'noni anglatadi?"],"correct":"B","options":{"A":"Sahifa topilmadi","B":"Server ichki xatosi","C":"Muvaffaqiyatli bajarildi","D":"Ruxsat yo'q"}},{"text":["Agar p=1, q=1, k=0 bo'lsa, quyidagi ifodaning natijasini aniqlang:","(p AND q) OR (NOT k)"],"correct":"D","options":{"A":"0","B":"p","C":"k","D":"1"},"ball":1.5},{"text":["Quyidagilardan qaysilari faqat chiqarish qurilmalari hisoblanadi?","1) Monitor  2) Klaviatura  3) Printer  4) Skaner  5) Proyektor  6) Mikrofon"],"correct":"A","options":{"A":"1, 3, 5","B":"2, 4, 6","C":"1, 2, 3","D":"4, 5, 6"},"ball":1.5},{"text":["Quyidagilardan qaysilari tizim dasturiy ta'minotiga misol bo'ladi?","1) Windows  2) Chrome  3) Linux  4) Word  5) macOS  6) Excel"],"correct":"A","options":{"A":"1, 3, 5","B":"2, 4, 6","C":"1, 2, 3","D":"3, 4, 6"},"ball":1.5},{"text":["MS Excel jadvalda A1=9, B1=4.","=IF(OR(A1>10,B1<5), A1+B1, A1*B1)","formula natijasini hisoblang."],"correct":"A","options":{"A":"13","B":"36","C":"9","D":"4"},"ball":1.5},{"text":["Quyidagi misollardan qaysi biri Birga-ko'p (One-to-Many) munosabatiga mos keladi?"],"correct":"B","options":{"A":"Talaba ↔ (bitta) ID","B":"Muallif ↔ Kitoblari","C":"Fuqaro ↔ Pasport","D":"Xodim ↔ Pasport ma'lumotlari"},"ball":1.5},{"text":["Quyidagi HEX rang kodini RGB formatiga o'tkazing.","#FFFF00"],"correct":"A","options":{"A":"(255, 255, 0)","B":"(0, 255, 255)","C":"(255, 0, 255)","D":"(0, 0, 0)"},"ball":1.5},{"text":["Nechta foydalaniladigan xost IP mavjud?","IP: 192.168.5.0 / 30"],"correct":"B","options":{"A":"4","B":"2","C":"6","D":"8"},"ball":1.5},{"text":["HTTP status kodi 404 nima ma'noni anglatadi?"],"correct":"C","options":{"A":"Server xatosi","B":"So'rov muvaffaqiyatli bajarildi","C":"Sahifa topilmadi","D":"Ruxsat yo'q"},"ball":1.5}]},{"ball":2.6,"questions":[{"ball":2.6,"text":["Students jadvalidan yoshi 15 dan kichiklarini chiqarish uchun qaysi so'rov to'g'ri?"],"correct":"A","options":{"A":"SELECT * FROM Students WHERE Age < 15;","B":"SELECT * FROM Students WHERE Age > 15;","C":"UPDATE Students SET Age < 15;","D":"DELETE FROM Students WHERE Age < 15;"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","lst = [3, -1, 5, 0, 2]","i = 0","for n in lst:","    if n > 0:","        i += 1","print(i)"],"correct":"B","options":{"A":"5","B":"3","C":"2","D":"0"}},{"ball":2.6,"text":["Algoritm natijasini aniqlang: S = 0, i = 1 dan boshlanadi.","i <= 4 bo'lguncha: S = S + 2*i, so'ng i = i + 1.","Sikl tugagach S ning qiymati nechaga teng bo'ladi?"],"correct":"C","options":{"A":"12","B":"30","C":"20","D":"0"}},{"ball":2.6,"text":["MS Accessda quyidagi jadval yaratilgan.","Criteria (Условие) qatoridagi Nomi ustuniga quyidagi shart yozilgan bo'lsa, so'rov natijasini aniqlang:","LIKE \"S*\""],"correct":"D","table":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["1","Olma","Meva","4000"],["2","Shirin choy","Ichimlik","6000"],["3","Sabzi","Sabzavot","2000"],["4","Sut","Ichimlik","9000"],["5","Banan","Meva","5000"]]},"optionTables":{"A":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["1","Olma","Meva","4000"],["5","Banan","Meva","5000"]]},"B":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["1","Olma","Meva","4000"],["2","Shirin choy","Ichimlik","6000"]]},"C":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["3","Sabzi","Sabzavot","2000"],["5","Banan","Meva","5000"]]},"D":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["2","Shirin choy","Ichimlik","6000"],["3","Sabzi","Sabzavot","2000"],["4","Sut","Ichimlik","9000"]]}}},{"ball":2.6,"text":["O'tkazishni bajaring:","36₁₀ → x₈"],"correct":"A","options":{"A":"44","B":"45","C":"100","D":"34"}},{"ball":2.6,"text":["Fayl arxivlangach 25% ga qisqardi.","Qisqargan fayl 2 Mbit/s tezlik bilan 2 daqiqada (120 soniya) yuklab olindi.","Dastlabki faylning hajmi (MB) qancha edi?"],"correct":"B","options":{"A":"30","B":"40","C":"45","D":"50"}},{"ball":2.6,"text":["ASCII jadvalida kichik “c” harfining o'nlik kodini aniqlang.","(“a” harfi 97 ga teng ekanligidan foydalaning.)"],"correct":"C","options":{"A":"67","B":"97","C":"99","D":"100"}},{"ball":2.6,"text":["Quyidagi mantiqiy ifodaning rostlik jadvalida nechta ROST qiymat bor?","(p AND q) OR (NOT k)"],"correct":"D","options":{"A":"3","B":"4","C":"6","D":"5"}},{"ball":2.6,"text":["MS Excelda quyidagi jadval berilgan.","=AVERAGE(A1:C3)","formulaning natijasini hisoblang."],"correct":"A","options":{"A":"2","B":"3","C":"18","D":"9"},"table":{"headers":["","A","B","C"],"rows":[["1","4","2","3"],["2","5","-3","1"],["3","2","3","1"]]}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","lst = [5, 3, -2, 4, 8]","p = 1","for x in lst:","    if x < 0:","        break","    p *= x","print(p)"],"correct":"B","options":{"A":"1","B":"15","C":"-120","D":"0"}},{"ball":2.6,"text":["SQLda jadvaldagi mavjud yozuvni yangilash uchun qaysi buyruq ishlatiladi?"],"correct":"C","options":{"C":"UPDATE","A":"SELECT","B":"INSERT","D":"DELETE"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","lst = [2, -5, 7, -1, 3]","i = 0","for n in lst:","    if n < 0:","        i += 1","print(i)"],"correct":"D","options":{"D":"2","A":"3","B":"1","C":"0"}},{"ball":2.6,"text":["Algoritm natijasini aniqlang: S = 0, i = 1 dan boshlanadi.","i <= 5 bo'lguncha: S = S + i*2, so'ng i = i + 1.","Sikl tugagach S ning qiymati nechaga teng bo'ladi?"],"correct":"A","options":{"A":"30","B":"15","C":"20","D":"10"}},{"ball":2.6,"text":["MS Accessda quyidagi jadval yaratilgan.","Criteria (Условие отбора) qatoridagi Tur ustuniga quyidagi shart yozilgan bo'lsa, so'rov natijasini aniqlang:","Like \"Ichimlik\""],"correct":"B","table":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["1","Anvar suvi","Ichimlik","3000"],["2","Olma","Meva","4000"],["3","Choy","Ichimlik","2500"],["4","Sabzi","Sabzavot","1500"]]},"optionTables":{"B":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["1","Anvar suvi","Ichimlik","3000"],["3","Choy","Ichimlik","2500"]]},"A":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["2","Olma","Meva","4000"],["4","Sabzi","Sabzavot","1500"]]},"C":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["1","Anvar suvi","Ichimlik","3000"],["2","Olma","Meva","4000"]]},"D":{"headers":["ID","Nomi","Tur","Narx"],"rows":[["3","Choy","Ichimlik","2500"],["4","Sabzi","Sabzavot","1500"]]}}},{"ball":2.6,"text":["O'tkazishni bajaring:","10₁₀ → x₈"],"correct":"C","options":{"C":"12","A":"10","B":"14","D":"11"}},{"ball":2.6,"text":["Fayl arxivlangach 50% ga qisqardi.","Qisqargan fayl 4 Mbit/s tezlik bilan 40 soniyada yuklab olindi.","Dastlabki faylning hajmi (MB) qancha edi?"],"correct":"D","options":{"D":"40","A":"20","B":"30","C":"50"}},{"ball":2.6,"text":["ASCII jadvalida katta “A” harfi 65 ga teng.","Shundan foydalanib katta “D” harfining o'nlik kodini aniqlang."],"correct":"A","options":{"A":"68","B":"66","C":"67","D":"69"}},{"ball":2.6,"text":["Agar p = 1, q = 0 bo'lsa, quyidagi ifodalardan nechtasi ROST?","1) p ∨ q","2) ¬p ∧ q","3) p ∧ ¬q"],"correct":"B","options":{"A":"1","B":"2","C":"3","D":"0"}},{"ball":2.6,"text":["MS Excelda A1=5, B1=3, C1=7.","=AVERAGE(A1:C1) + MAX(A1:C1)","formula natijasini hisoblang."],"correct":"C","options":{"C":"12","A":"15","B":"5","D":"7"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","def g(a, b):","    return a - b * 2","y = g(10, 3)","print(y)"],"correct":"D","options":{"D":"4","A":"16","B":"7","C":"-4"}},{"text":["Talabalar jadvalidan Familiyasi ‘Karimov’ bo'lganlarni topish uchun","qaysi so'rov to'g'ri?"],"correct":"A","options":{"A":"SELECT * FROM Talabalar WHERE Familiya='Karimov';","B":"UPDATE Talabalar SET Familiya='Karimov';","C":"DELETE FROM Talabalar WHERE Familiya='Karimov';","D":"SELECT Familiya FROM Talabalar;"},"ball":2.6},{"text":["Quyidagi kod natijasini aniqlang.","lst = [4, -2, 6, -8, 10]","s = 0","for n in lst:","    if n % 2 == 0 and n > 0:","        s += n","print(s)"],"correct":"A","options":{"A":"20","B":"10","C":"30","D":"0"},"ball":2.6},{"text":["O'tkazishni bajaring:","45₁₀ → x₈"],"correct":"A","options":{"A":"55","B":"45","C":"54","D":"65"},"ball":2.6},{"text":["Fayl arxivlangach 20% ga qisqardi.","Qisqargan fayl 8 Mbit/s tezlik bilan 32 soniyada yuklab olindi.","Dastlabki faylning hajmi (MB) qancha edi?"],"correct":"A","options":{"A":"40","B":"32","C":"36","D":"45"},"ball":2.6},{"text":["ASCII jadvalida katta “A” harfi 65 ga teng.","Shundan foydalanib katta “F” harfining o'nlik kodini aniqlang."],"correct":"A","options":{"A":"70","B":"69","C":"71","D":"68"},"ball":2.6},{"text":["Agar p = 1, q = 0 bo'lsa, quyidagi ifodalardan nechtasi ROST?","1) p ∨ q","2) ¬p ∨ q","3) p ∧ ¬q"],"correct":"B","options":{"A":"1","B":"2","C":"3","D":"0"},"ball":2.6},{"text":["MS Excelda A1=12, B1=4, C1=3.","=IF(A1/B1>C1, A1-B1, A1+B1)","formula natijasini hisoblang."],"correct":"A","options":{"A":"16","B":"8","C":"3","D":"9"},"ball":2.6},{"text":["Quyidagi kod natijasini aniqlang.","def f(a, b):","    return a**2 - b","x = f(4, 5)","print(x)"],"correct":"A","options":{"A":"11","B":"9","C":"21","D":"1"},"ball":2.6}]}]},"11":{"tiers":[{"ball":0.9,"questions":[{"ball":0.9,"text":["Kompyuterning tezkor xotirasi (RAM) asosiy vazifasi nimadan iborat?"],"correct":"A","options":{"A":"Dasturlar va ma'lumotlarni ishlash jarayonida vaqtinchalik saqlash","B":"Ma'lumotlarni doimiy saqlash","C":"Kompyuterni viruslardan himoya qilish","D":"Dasturlarni faqat o'rnatish uchun ishlatiladi"}},{"ball":0.9,"text":["[A-C]*.txt maskasi qaysi fayl nomiga mos EMAS?"],"correct":"B","options":{"A":"Afile.txt","B":"Ddoc.txt","C":"Bfile.txt","D":"Cdata.txt"}},{"ball":0.9,"text":["www.support.microsoft.com manzilidagi birinchi darajali (TLD) domenni aniqlang."],"correct":"C","options":{"A":"support","B":"microsoft","C":"com","D":"www"}},{"ball":0.9,"text":["1 daqiqa davom etuvchi mono (1 ta kanal) audio yozuv 8192 Hz, 8 bit formatda yozilgan.","Agar 1 belgi = 1 bayt deb olinsa, faylning hajmi necha KB?"],"correct":"D","options":{"A":"240","B":"512","C":"960","D":"480"}},{"ball":0.9,"text":["Quyida algoritm berilgan:","1. Boshlash","2. S = 0, i = 1","3. Agar i ≤ 5 bo'lsa → S = S + i, i = i + 1, 3-qadamga qaytadi","4. Aks holda → 5-qadamga o'tadi","5. S ni chiqarish","6. Tugatish","Ushbu algoritm ishlaganidan so'ng S ning qiymati qancha bo'ladi?"],"correct":"A","options":{"A":"15","B":"20","C":"10","D":"6"}},{"ball":0.9,"text":["Quyidagi kod natijasini aniqlang.","S = 0","for n in range(1, 21):","    if n % 5 == 0:","        S += n","print(S)"],"correct":"B","options":{"A":"45","B":"50","C":"40","D":"60"}},{"ball":0.9,"text":["Kitob:","• Har bir sahifa – 32 qator","• Har qator – 32 belgi","• Kitob – 3 sahifa","Agar 1 belgi = 1 bayt deb olinsa, kitobning hajmi necha KB?"],"correct":"C","options":{"A":"2","B":"4","C":"3","D":"6"}},{"ball":0.9,"text":["60 MB hajmdagi faylni internet orqali 10 Mbit/s tezlikda yuborish uchun qancha vaqt kerak bo'ladi?"],"correct":"D","options":{"A":"24 soniya","B":"36 soniya","C":"40 soniya","D":"48 soniya"}},{"ball":0.9,"text":["Kalit: 3","Shifrlangan matn: FDW","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Matn Sezar (Caesar) shifri usulida shifrlangan. Deshifrlab asl matnni aniqlang."],"correct":"A","options":{"A":"CAT","B":"CAR","C":"BAT","D":"CAP"}},{"ball":0.9,"text":["Noma'lum sanoq sistemasining asosini aniqlang.","21ₓ = 9₁₀"],"correct":"B","options":{"A":"3","B":"4","C":"5","D":"6"}},{"ball":0.9,"text":["Kompyuterning RAM xotirasi qanday xotira turiga kiradi?"],"correct":"C","options":{"C":"Vaqtinchalik (operativ) xotira","A":"Doimiy xotira","B":"Tashqi xotira","D":"Protsessor"}},{"ball":0.9,"text":["[D-F]*.doc maskasi qaysi fayl nomiga mos keladi?"],"correct":"D","options":{"D":"Dfile.doc","A":"Cfile.doc","B":"Gfile.doc","C":"Afile.doc"}},{"ball":0.9,"text":["www.gov.uz manzilidagi birinchi darajali (TLD) domenni aniqlang."],"correct":"A","options":{"A":"uz","B":"www","C":"gov","D":"gov.uz"}},{"ball":0.9,"text":["30 soniya davom etuvchi mono (1 ta kanal) audio yozuv 8192 Hz, 8 bit formatda yozilgan.","Agar 1 belgi = 1 bayt deb olinsa, faylning hajmi necha KB?"],"correct":"B","options":{"B":"240","A":"120","C":"480","D":"60"}},{"ball":0.9,"text":["Quyida algoritm berilgan:","1. Boshlash","2. S = 0, i = 1","3. Agar i ≤ 6 bo'lsa → S = S + i, i = i + 1, 3-qadamga qaytadi","4. Aks holda → 5-qadamga o'tadi","5. S ni chiqarish","6. Tugatish","Ushbu algoritm ishlaganidan so'ng S ning qiymati qancha bo'ladi?"],"correct":"C","options":{"C":"21","A":"15","B":"6","D":"36"}},{"ball":0.9,"text":["Quyidagi kod natijasini aniqlang.","S = 0","for n in range(1, 31):","    if n % 10 == 0:","        S += n","print(S)"],"correct":"D","options":{"D":"60","A":"50","B":"40","C":"30"}},{"ball":0.9,"text":["Kitob:","• Har bir sahifa – 32 qator","• Har qator – 16 belgi","• Kitob – 2 sahifa","Agar 1 belgi = 1 bayt deb olinsa, kitobning hajmi necha KB?"],"correct":"A","options":{"A":"1","B":"2","C":"0,5","D":"4"}},{"ball":0.9,"text":["80 MB hajmdagi faylni internet orqali 20 Mbit/s tezlikda yuborish uchun qancha vaqt kerak bo'ladi?"],"correct":"B","options":{"A":"16 soniya","B":"32 soniya","C":"40 soniya","D":"64 soniya"}},{"ball":0.9,"text":["Kalit: 4","Shifrlangan matn: FII","Ingliz alifbosi: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z","Matn Sezar (Caesar) shifri usulida shifrlangan. Deshifrlab asl matnni aniqlang."],"correct":"C","options":{"C":"BEE","A":"BEA","B":"CEE","D":"BFE"}},{"ball":0.9,"text":["Noma'lum sanoq sistemasining asosini aniqlang.","30ₓ = 12₁₀"],"correct":"D","options":{"D":"4","A":"3","B":"5","C":"6"}},{"text":["Kompyuterning protsessor tezligi qaysi birlikda o'lchanadi?"],"correct":"A","options":{"A":"GHz","B":"GB","C":"Mbps","D":"dpi"},"ball":0.9},{"text":["Quyidagi maska “[M-P]*.doc” qaysi fayl nomiga mos EMAS?"],"correct":"D","options":{"A":"Mfile.doc","B":"Nfile.doc","C":"Ofile.doc","D":"Qfile.doc"},"ball":0.9},{"text":["mail.example.co.uk manzilidagi eng yuqori darajali (TLD) domenni aniqlang."],"correct":"A","options":{"A":"uk","B":"co","C":"example","D":"mail"},"ball":0.9},{"text":["45 soniyalik mono (1 kanal) audio yozuv 8192 Hz, 8 bit formatda yozilgan.","Agar 1 belgi = 1 bayt deb olinsa, faylning hajmi necha KB?"],"correct":"A","options":{"A":"360","B":"320","C":"400","D":"180"},"ball":0.9},{"text":["Quyida algoritm berilgan:","1. Boshlash","2. S = 0, i = 1","3. Agar i ≤ 7 bo'lsa → S = S + i, i = i + 1, 3-qadamga qaytadi","4. Aks holda → 5-qadamga o'tadi","5. S ni chiqarish","6. Tugatish","Ushbu algoritm ishlaganidan so'ng S ning qiymati qancha bo'ladi?"],"correct":"A","options":{"A":"28","B":"21","C":"36","D":"14"},"ball":0.9},{"text":["Quyidagi kod natijasini aniqlang.","S = 0","for n in range(1, 26):","    if n % 7 == 0:","        S += n","print(S)"],"correct":"A","options":{"A":"42","B":"35","C":"49","D":"28"},"ball":0.9},{"text":["Kitob:","• Har bir sahifa – 32 qator","• Har qator – 32 belgi","• Kitob – 4 sahifa","Agar 1 belgi = 1 bayt deb olinsa,","kitobning hajmi necha KB?"],"correct":"A","options":{"A":"4","B":"2","C":"8","D":"16"},"ball":0.9},{"text":["100 MB hajmdagi faylni internet orqali 25 Mbit/s tezlikda yuborish uchun","qancha vaqt kerak bo'ladi?"],"correct":"A","options":{"A":"32 soniya","B":"25 soniya","C":"40 soniya","D":"20 soniya"},"ball":0.9}]},{"ball":1.5,"questions":[{"ball":1.5,"text":["Agar x=1, y=0, z=1 bo'lsa, quyidagi ifodaning natijasini aniqlang:","(x OR y) AND (NOT z)"],"correct":"C","options":{"A":"1","B":"x","C":"0","D":"z"}},{"ball":1.5,"text":["Quyidagilardan qaysilari faqat tashqi xotira qurilmalari hisoblanadi?","1) Flash-disk  2) RAM  3) Qattiq disk (HDD)  4) SSD  5) ROM  6) CD/DVD disk"],"correct":"D","options":{"A":"1, 3, 4","B":"2, 3, 5","C":"1, 2, 6","D":"1, 3, 6"}},{"ball":1.5,"text":["Quyidagilardan qaysilari dasturlash tillari hisoblanadi?","1) Python  2) Java  3) PyCharm  4) Windows  5) C++  6) Excel"],"correct":"A","options":{"A":"1, 2, 5","B":"1, 2, 4","C":"1, 3, 5","D":"2, 3, 6"}},{"ball":1.5,"text":["MS Excel jadvalda A1=4, A2=6, B1=3.","=PRODUCT(A1:A2) + MAX(A1:B1) − MIN(A1:B1)","formula natijasini hisoblang."],"correct":"B","options":{"A":"22","B":"25","C":"30","D":"27"}},{"ball":1.5,"text":["Sizning Access bazangizda “Kitoblar” jadvali bor: ID, Nomi, Muallif, Yili.","Har bir kitob unikal bo'lishi uchun qaysi maydonni birlamchi kalit sifatida tanlash eng to'g'ri bo'ladi?"],"correct":"C","options":{"A":"Nomi","B":"Muallif","C":"ID","D":"Yili"}},{"ball":1.5,"text":["HEX rang kodini RGB formatiga o'tkazing.","#0000FF"],"correct":"D","options":{"A":"(255, 0, 0)","B":"(0, 255, 0)","C":"(255, 255, 0)","D":"(0, 0, 255)"}},{"ball":1.5,"text":["Video fayl 1 soniya davom etadi, kadr o'lchami 128×64, rang chuqurligi 8 bit,","1 soniyada kadrlar soni 10 ta. Video faylning hajmini (KB) aniqlang."],"correct":"A","options":{"A":"80","B":"40","C":"160","D":"8192"}},{"ball":1.5,"text":["Nechta foydalaniladigan xost IP mavjud?","IP: 192.168.1.0 / 29"],"correct":"B","options":{"A":"8","B":"6","C":"4","D":"2"}},{"ball":1.5,"text":["Aholi sonining o'sishini ifodalovchi tenglama P = P₀(1+r)ᵗ qaysi turdagi modelga kiradi?"],"correct":"C","options":{"A":"Grafik model","B":"Algoritmik model","C":"Matematik model","D":"Fizik model"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri JavaScript framework EMAS?"],"correct":"D","options":{"A":"React","B":"Angular","C":"Vue","D":"Bootstrap"}},{"ball":1.5,"text":["Agar x=0, y=1, z=0 bo'lsa, quyidagi ifodaning natijasini aniqlang:","(x AND y) OR (NOT z)"],"correct":"A","options":{"A":"1","B":"0","C":"x","D":"z"}},{"ball":1.5,"text":["Quyidagilardan qaysilari faqat tashqi xotira qurilmalari hisoblanadi?","1) SSD  2) RAM  3) CD  4) ROM  5) Flash-disk  6) Cache"],"correct":"B","options":{"B":"1, 3, 5","A":"2, 4, 6","C":"1, 2, 3","D":"4, 5, 6"}},{"ball":1.5,"text":["Quyidagilardan qaysilari dasturlash tillari hisoblanadi?","1) C#  2) Photoshop  3) Ruby  4) Word  5) Kotlin  6) Excel"],"correct":"C","options":{"C":"1, 3, 5","A":"2, 4, 6","B":"1, 2, 3","D":"3, 4, 6"}},{"ball":1.5,"text":["MS Excel jadvalda A1=5, A2=3, B1=2.","=PRODUCT(A1:A2) + MAX(A1:B1) − MIN(A1:B1)","formula natijasini hisoblang."],"correct":"D","options":{"D":"18","A":"15","B":"10","C":"20"}},{"ball":1.5,"text":["Sizning Access bazangizda “Talabalar” jadvali bor: ID, FISH, Guruh, Reyting.","Har bir talaba unikal bo'lishi uchun qaysi maydonni birlamchi kalit sifatida tanlash eng to'g'ri bo'ladi?"],"correct":"A","options":{"A":"ID","B":"FISH","C":"Guruh","D":"Reyting"}},{"ball":1.5,"text":["HEX rang kodini RGB formatiga o'tkazing.","#FF00FF"],"correct":"B","options":{"B":"(255, 0, 255)","A":"(0, 255, 255)","C":"(255, 255, 0)","D":"(0, 0, 0)"}},{"ball":1.5,"text":["Video fayl 2 soniya davom etadi, kadr o'lchami 64×64, rang chuqurligi 8 bit,","1 soniyada kadrlar soni 5 ta. Video faylning hajmini (KB) aniqlang."],"correct":"C","options":{"C":"40","A":"20","B":"80","D":"160"}},{"ball":1.5,"text":["Nechta foydalaniladigan xost IP mavjud?","IP: 10.0.0.0 / 27"],"correct":"D","options":{"D":"30","A":"32","B":"28","C":"16"}},{"ball":1.5,"text":["Raketaning uchish traektoriyasini tenglama orqali ifodalash qaysi turdagi modelga kiradi?"],"correct":"A","options":{"A":"Matematik model","B":"Fizik model","C":"Grafik model","D":"Statistik model"}},{"ball":1.5,"text":["Quyidagilardan qaysi biri versiya nazorati tizimi (VCS) hisoblanadi?"],"correct":"B","options":{"B":"Git","A":"Docker","C":"Nginx","D":"MySQL"}},{"text":["Agar x=1, y=1, z=0 bo'lsa, quyidagi ifodaning natijasini aniqlang:","(x AND y) OR (NOT z)"],"correct":"B","options":{"A":"0","B":"1","C":"x","D":"z"},"ball":1.5},{"text":["Quyidagilardan qaysilari faqat tashqi (ikkilamchi) xotira qurilmalari hisoblanadi?","1) HDD  2) Cache  3) SSD  4) RAM  5) Flash-disk  6) ROM"],"correct":"A","options":{"A":"1, 3, 5","B":"2, 4, 6","C":"1, 2, 3","D":"4, 5, 6"},"ball":1.5},{"text":["Quyidagilardan qaysilari dasturlash tillari hisoblanadi?","1) Rust  2) Excel  3) Go  4) Photoshop  5) Swift  6) Windows"],"correct":"A","options":{"A":"1, 3, 5","B":"2, 4, 6","C":"1, 2, 3","D":"3, 4, 6"},"ball":1.5},{"text":["MS Excel jadvalda A1=7, A2=3, B1=9.","=PRODUCT(A1:A2) + MAX(A1:B1) − MIN(A1:B1)","formula natijasini hisoblang."],"correct":"A","options":{"A":"27","B":"21","C":"30","D":"24"},"ball":1.5},{"text":["Sizning Access bazangizda “Buyurtmalar” jadvali bor: ID, Mijoz, Sana, Summa.","Har bir buyurtma unikal bo'lishi uchun qaysi maydonni birlamchi kalit","sifatida tanlash eng to'g'ri bo'ladi?"],"correct":"A","options":{"A":"ID","B":"Mijoz","C":"Sana","D":"Summa"},"ball":1.5},{"text":["HEX rang kodini RGB formatiga o'tkazing.","#808080"],"correct":"A","options":{"A":"(128, 128, 128)","B":"(0, 0, 0)","C":"(255, 255, 255)","D":"(128, 0, 0)"},"ball":1.5},{"text":["Video fayl 3 soniya davom etadi, kadr o'lchami 64×32, rang chuqurligi 8 bit,","1 soniyada kadrlar soni 8 ta. Video faylning hajmini (KB) aniqlang."],"correct":"A","options":{"A":"48","B":"24","C":"96","D":"192"},"ball":1.5},{"text":["Nechta foydalaniladigan xost IP mavjud?","IP: 172.16.0.0 / 26"],"correct":"A","options":{"A":"62","B":"64","C":"30","D":"126"},"ball":1.5}]},{"ball":2.6,"questions":[{"ball":2.6,"text":["Talabalar jadvalidan Yoshi=18 bo'lgan talabalar sonini hisoblash uchun qaysi so'rov to'g'ri?"],"correct":"A","options":{"A":"SELECT COUNT(*) FROM Talabalar WHERE Yoshi = 18;","B":"SELECT SUM(Yoshi) FROM Talabalar WHERE Yoshi = 18;","C":"SELECT * FROM Talabalar WHERE Yoshi = 18;","D":"DELETE FROM Talabalar WHERE Yoshi = 18;"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","list = [5, -2, 3, 0, -4]","S = 0","for n in list:","    if n > 0:","        S += n","print(S)"],"correct":"B","options":{"A":"-6","B":"8","C":"0","D":"2"}},{"ball":2.6,"text":["Algoritm natijasini aniqlang: P = 1, i = 4 dan boshlanadi.","i ≥ 1 bo'lguncha: P = P * i, so'ng i = i − 1.","Sikl tugagach P ning qiymati nechaga teng bo'ladi?"],"correct":"C","options":{"A":"10","B":"4","C":"24","D":"0"}},{"ball":2.6,"text":["MS Accessda quyidagi jadval yaratilgan.","Criteria (Условие отбора) qatoridagi Familiya ustuniga quyidagi shart yozilgan bo'lsa, so'rov natijasini aniqlang:","Like \"*ova\""],"correct":"D","table":{"headers":["ID","Familiya","Ism","Yosh","Ball"],"rows":[["1","Karimov","Aziz","17","85"],["2","Rahimova","Laylo","18","90"],["3","Sodiqov","Bekzod","17","78"],["4","Yusupova","Dilnoza","18","95"]]},"optionTables":{"A":{"headers":["ID","Familiya","Ism","Yosh","Ball"],"rows":[["1","Karimov","Aziz","17","85"],["3","Sodiqov","Bekzod","17","78"]]},"B":{"headers":["ID","Familiya","Ism","Yosh","Ball"],"rows":[["1","Karimov","Aziz","17","85"],["2","Rahimova","Laylo","18","90"]]},"C":{"headers":["ID","Familiya","Ism","Yosh","Ball"],"rows":[["3","Sodiqov","Bekzod","17","78"],["4","Yusupova","Dilnoza","18","95"]]},"D":{"headers":["ID","Familiya","Ism","Yosh","Ball"],"rows":[["2","Rahimova","Laylo","18","90"],["4","Yusupova","Dilnoza","18","95"]]}}},{"ball":2.6,"text":["O'tkazishni bajaring:","82₁₀ → x₈"],"correct":"A","options":{"A":"122","B":"112","C":"130","D":"121"}},{"ball":2.6,"text":["Emailda bitta xabar uchun 15 MB lik cheklov mavjud.","Rasmlarning har biri 3 MB hajmga ega bo'lsa, 40 ta rasmni nechta xabarda yuborish mumkin?"],"correct":"B","options":{"A":"6","B":"8","C":"5","D":"10"}},{"ball":2.6,"text":["Firmada 50 ta ishchi ishlaydi. Kadrlar bo'limi ularni ikkilik sanoq sistemasida kodlashni rejalashtirmoqda.","Xodimlarni kodlash uchun eng kamida necha bit kerak bo'ladi?"],"correct":"C","options":{"A":"5","B":"7","C":"6","D":"8"}},{"ball":2.6,"text":["Agar p ∧ ¬q = 1 bo'lsa (ya'ni p=1, q=0), quyidagi mantiqiy ifodaning qiymatini hisoblang:","¬(p ∨ q) ∧ ¬k"],"correct":"D","options":{"A":"¬q","B":"p","C":"1","D":"0"}},{"ball":2.6,"text":["A1=3, A2=-2, A3=4 bo'lsa,","=IF(A1>A2, INT(5.9)+2, SUM(A1:A3))","formulaning natijasini toping."],"correct":"A","options":{"A":"7","B":"5","C":"5,9","D":"0"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","sonlar_1 = [3, 6, 9, 12, 15, 18, 21]","sonlar_2 = []","for son in sonlar_1:","    if son % 3 == 0 and son % 2 == 0:","        sonlar_2.append(son)","print(sonlar_2)"],"correct":"B","options":{"A":"[3, 9, 15, 21]","B":"[6, 12, 18]","C":"[3, 6, 9, 12, 15, 18, 21]","D":"42"}},{"ball":2.6,"text":["SQLda jadvaldagi mavjud yozuvni yangilash uchun qaysi buyruq ishlatiladi?"],"correct":"C","options":{"C":"UPDATE","A":"ALTER","B":"SELECT","D":"DROP"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","lst = [10, -3, 4, -7, 2]","S = 0","for n in lst:","    if n < 0:","        S += n","print(S)"],"correct":"D","options":{"D":"-10","A":"10","B":"-3","C":"0"}},{"ball":2.6,"text":["Algoritm natijasini aniqlang: P = 1, i = 5 dan boshlanadi.","i ≥ 2 bo'lguncha: P = P * i, so'ng i = i − 1.","Sikl tugagach P ning qiymati nechaga teng bo'ladi?"],"correct":"A","options":{"A":"120","B":"24","C":"60","D":"0"}},{"ball":2.6,"text":["MS Accessda quyidagi jadval yaratilgan.","Criteria (Условие отбора) qatoridagi Familiya ustuniga quyidagi shart yozilgan bo'lsa, so'rov natijasini aniqlang:","Like \"Botir*\""],"correct":"B","table":{"headers":["ID","Familiya","Ball"],"rows":[["1","Botirov","92"],["2","Aliyev","78"],["3","Botirova","85"],["4","Yusupov","90"]]},"optionTables":{"B":{"headers":["ID","Familiya","Ball"],"rows":[["1","Botirov","92"],["3","Botirova","85"]]},"A":{"headers":["ID","Familiya","Ball"],"rows":[["2","Aliyev","78"],["4","Yusupov","90"]]},"C":{"headers":["ID","Familiya","Ball"],"rows":[["1","Botirov","92"],["2","Aliyev","78"]]},"D":{"headers":["ID","Familiya","Ball"],"rows":[["3","Botirova","85"],["4","Yusupov","90"]]}}},{"ball":2.6,"text":["O'tkazishni bajaring:","100₁₀ → x₁₆"],"correct":"C","options":{"C":"64","A":"6A","B":"5F","D":"70"}},{"ball":2.6,"text":["Fayl arxivlashdan so'ng 25% ga kattalashib, 100 MB bo'ldi.","Faylning dastlabki hajmi (MB) qancha edi?"],"correct":"D","options":{"D":"80","A":"75","B":"90","C":"120"}},{"ball":2.6,"text":["ASCII jadvalida kichik “a” harfi 97 ga teng.","Shundan foydalanib kichik “e” harfining o'nlik kodini aniqlang."],"correct":"A","options":{"A":"101","B":"100","C":"102","D":"103"}},{"ball":2.6,"text":["Agar p = 0, q = 0 bo'lsa, quyidagi mantiqiy ifodaning qiymatini hisoblang:","¬(p ∨ q) ∧ ¬k"],"correct":"B","options":{"B":"¬k","A":"0","C":"1","D":"k"}},{"ball":2.6,"text":["MS Excelda A1=8, B1=-2, C1=6.","=SUM(A1:C1) − MIN(A1:C1)","formula natijasini hisoblang."],"correct":"C","options":{"C":"14","A":"12","B":"10","D":"-2"}},{"ball":2.6,"text":["Quyidagi kod natijasini aniqlang.","def h(a, b):","    return (a + b) * 2","z = h(3, 5)","print(z)"],"correct":"D","options":{"D":"16","A":"8","B":"13","C":"11"}},{"text":["Xodimlar jadvalidan Oylik >= 5000000 bo'lganlar sonini hisoblash uchun","qaysi so'rov to'g'ri?"],"correct":"A","options":{"A":"SELECT COUNT(*) FROM Xodimlar WHERE Oylik >= 5000000;","B":"SELECT SUM(Oylik) FROM Xodimlar WHERE Oylik >= 5000000;","C":"SELECT * FROM Xodimlar;","D":"DELETE FROM Xodimlar WHERE Oylik >= 5000000;"},"ball":2.6},{"text":["Quyidagi kod natijasini aniqlang.","lst = [8, -3, 5, -1, 9]","P = 1","for n in lst:","    if n < 0:","        continue","    P *= n","print(P)"],"correct":"A","options":{"A":"360","B":"-360","C":"8","D":"0"},"ball":2.6},{"text":["Algoritm natijasini aniqlang: P = 1, i = 6 dan boshlanadi.","i ≥ 1 bo'lguncha: P = P * i, so'ng i = i − 1.","Sikl tugagach P ning qiymati nechaga teng bo'ladi?"],"correct":"A","options":{"A":"720","B":"120","C":"36","D":"0"},"ball":2.6},{"text":["MS Accessda ‘Familiya’ ustuniga quyidagi shart yozilgan:","Like “*ov”","Ushbu shart qanday familiyalarni tanlaydi?"],"correct":"A","options":{"A":"‘ov’ bilan tugaydigan familiyalarni","B":"‘ov’ bilan boshlanadigan familiyalarni","C":"Tarkibida ‘ov’ harflari bo'lmagan familiyalarni","D":"Aynan ‘ov’ so'ziga teng familiyalarni"},"ball":2.6},{"text":["O'tkazishni bajaring:","120₁₀ → x₁₆"],"correct":"A","options":{"A":"78","B":"87","C":"70","D":"7A"},"ball":2.6},{"text":["Fayl arxivlashdan so'ng 30% ga kattalashib, 130 MB bo'ldi.","Faylning dastlabki hajmi (MB) qancha edi?"],"correct":"A","options":{"A":"100","B":"91","C":"110","D":"120"},"ball":2.6},{"text":["ASCII jadvalida kichik “a” harfi 97 ga teng.","Shundan foydalanib kichik “j” harfining o'nlik kodini aniqlang."],"correct":"A","options":{"A":"106","B":"105","C":"107","D":"104"},"ball":2.6},{"text":["Agar p = 0, q = 1 bo'lsa, quyidagi mantiqiy ifodaning qiymatini hisoblang:","¬(p ∧ q) ∨ k   (k – noma'lum o'zgaruvchi)"],"correct":"A","options":{"A":"1 (k qiymatidan qat'iy nazar)","B":"0","C":"k","D":"¬k"},"ball":2.6}]}]}};
+</script>
+<script>
+(function(){
+  "use strict";
+
+  // ---------- helpers ----------
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+
+  function isCodeLine(raw){
+    const line = raw.trim();
+    const proseMarkers = /bo'lsa|bo'ladi|hisoblang|natijasini|aniqlang|toping|nechta|qaysi|nima|qancha|deb olinsa/i;
+    if (proseMarkers.test(line)) return false;
+    if (/^=/.test(line)) return true;
+    if (/^(def|for|while|if|elif|else|return|print)\b/.test(line)) return true;
+    if (/^(break|continue|pass)$/.test(line)) return true;
+    if (/^[A-Za-z_][A-Za-z0-9_]*(\[[^\]]*\])?\s*(\+=|-=|\*=|\/=|==|=)\s*.+/.test(line)) return true;
+    if (/^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*\(.*\)\s*$/.test(line)) return true;
+    return false;
+  }
+
+  function renderTable(t){
+    let html = '<div class="q-table-wrap"><table class="q-table"><thead><tr>';
+    t.headers.forEach(h=>{ html += `<th>${escapeHtml(h)}</th>`; });
+    html += '</tr></thead><tbody>';
+    t.rows.forEach(row=>{
+      html += '<tr>';
+      row.forEach(cell=>{ html += `<td>${escapeHtml(cell)}</td>`; });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  function renderQuestionText(lines){
+    let html = '';
+    let buf = [];
+    function flush(){
+      if (buf.length){
+        html += '<pre class="code-block">' + escapeHtml(buf.join('\n')) + '</pre>';
+        buf = [];
+      }
+    }
+    lines.forEach(line=>{
+      if (isCodeLine(line)){
+        buf.push(line);
+      } else {
+        flush();
+        html += `<p>${escapeHtml(line)}</p>`;
+      }
+    });
+    flush();
+    return html;
+  }
+
+  const BALL_FMT = (b)=> String(b).replace(".", ",");
+  const TOTAL_SECONDS = 40*60;
+  const PER_TIER = 12;
+
+  // ---------- state ----------
+  let state = {
+    name:"", grade:null, questions:[], answers:[], flags:[], current:0,
+    secondsLeft: TOTAL_SECONDS, timerHandle:null, startedAt:null, elapsedSeconds:0,
+  };
+
+  const LETTERS = ["A","B","C","D"];
+
+  function shuffleOptionLetters(q){
+    if (q.options){
+      const entries = LETTERS.map(l=>({orig:l, val:q.options[l]}));
+      const shuffled = shuffle(entries);
+      const newOptions = {}; let newCorrect = null;
+      shuffled.forEach((e,i)=>{
+        const nl = LETTERS[i];
+        newOptions[nl] = e.val;
+        if (e.orig === q.correct) newCorrect = nl;
+      });
+      const copy = Object.assign({}, q);
+      copy.options = newOptions; copy.correct = newCorrect;
+      delete copy.optionTables;
+      return copy;
+    } else if (q.optionTables){
+      const entries = LETTERS.map(l=>({orig:l, val:q.optionTables[l]}));
+      const shuffled = shuffle(entries);
+      const newOT = {}; let newCorrect = null;
+      shuffled.forEach((e,i)=>{
+        const nl = LETTERS[i];
+        newOT[nl] = e.val;
+        if (e.orig === q.correct) newCorrect = nl;
+      });
+      const copy = Object.assign({}, q);
+      copy.optionTables = newOT; copy.correct = newCorrect;
+      return copy;
+    }
+    return q;
+  }
+
+  function buildQuizForGrade(grade){
+    const data = QUESTION_BANK[String(grade)];
+    let selected = [];
+    data.tiers.forEach(tier=>{
+      const chosen = shuffle(tier.questions).slice(0, PER_TIER);
+      chosen.forEach(q=>{
+        const withBall = Object.assign({}, q, {ball: tier.ball, tierBall: tier.ball});
+        selected.push(shuffleOptionLetters(withBall));
+      });
+    });
+    // keep tier order (easy->hard) but shuffle within tier already done; final light shuffle within same tier block only
+    // (do NOT globally shuffle so tier breakdown stays contiguous 1-12 / 13-24 / 25-36)
+    return selected;
+  }
+
+  // ---------- START SCREEN ----------
+  const nameInput = document.getElementById("student-name");
+  const classGrid = document.getElementById("class-grid");
+  const startBtn = document.getElementById("start-btn");
+  const startError = document.getElementById("start-error");
+  let selectedGrade = null;
+
+  classGrid.querySelectorAll(".class-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      classGrid.querySelectorAll(".class-btn").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedGrade = btn.getAttribute("data-grade");
+      startError.textContent = "";
+    });
+  });
+
+  startBtn.addEventListener("click", ()=>{
+    const name = nameInput.value.trim();
+    if (!name){ startError.textContent = "Iltimos, F.I.O.ingizni kiriting."; nameInput.focus(); return; }
+    if (!selectedGrade){ startError.textContent = "Iltimos, sinfingizni tanlang."; return; }
+    startError.textContent = "";
+
+    state.name = name;
+    state.grade = selectedGrade;
+    state.questions = buildQuizForGrade(selectedGrade);
+    state.answers = new Array(state.questions.length).fill(null);
+    state.flags = new Array(state.questions.length).fill(false);
+    state.current = 0;
+    state.secondsLeft = TOTAL_SECONDS;
+    state.startedAt = Date.now();
+
+    document.getElementById("quiz-name").textContent = state.name;
+    document.getElementById("quiz-grade").textContent = state.grade + "-sinf";
+    document.getElementById("chrome-title").textContent = "olimpiada_" + state.grade + "sinf.run";
+
+    buildNavGrid();
+    renderCurrentQuestion();
+    startTimer();
+
+    document.getElementById("screen-start").classList.add("hidden");
+    document.getElementById("screen-quiz").classList.remove("hidden");
+    window.scrollTo(0,0);
+  });
+
+  // ---------- TIMER ----------
+  const timerChip = document.getElementById("timer-chip");
+  function fmtTime(s){
+    const m = Math.floor(s/60), sec = s%60;
+    return String(m).padStart(2,"0") + ":" + String(sec).padStart(2,"0");
+  }
+  function startTimer(){
+    clearInterval(state.timerHandle);
+    updateTimerDisplay();
+    state.timerHandle = setInterval(()=>{
+      state.secondsLeft--;
+      if (state.secondsLeft <= 0){
+        state.secondsLeft = 0;
+        updateTimerDisplay();
+        clearInterval(state.timerHandle);
+        showResults();
+        return;
+      }
+      updateTimerDisplay();
+    }, 1000);
+  }
+  function updateTimerDisplay(){
+    timerChip.textContent = "⏱ " + fmtTime(state.secondsLeft);
+    timerChip.classList.remove("warn","danger");
+    if (state.secondsLeft <= 60) timerChip.classList.add("danger");
+    else if (state.secondsLeft <= 300) timerChip.classList.add("warn");
+  }
+
+  // ---------- QUIZ SCREEN ----------
+  const navGrid = document.getElementById("nav-grid");
+  const qBallTag = document.getElementById("q-ball-tag");
+  const qText = document.getElementById("q-text");
+  const qTableHolder = document.getElementById("q-table-holder");
+  const qOptions = document.getElementById("q-options");
+  const progressPill = document.getElementById("progress-pill");
+  const progressFill = document.getElementById("progress-fill");
+  const btnPrev = document.getElementById("btn-prev");
+  const btnNext = document.getElementById("btn-next");
+  const btnFinish = document.getElementById("btn-finish");
+  const flagBtn = document.getElementById("flag-btn");
+
+  function buildNavGrid(){
+    navGrid.innerHTML = "";
+    state.questions.forEach((q,i)=>{
+      const dot = document.createElement("div");
+      dot.className = "nav-dot";
+      dot.textContent = (i+1);
+      dot.addEventListener("click", ()=>{ state.current = i; renderCurrentQuestion(); });
+      navGrid.appendChild(dot);
+    });
+  }
+
+  function refreshNavGrid(){
+    const dots = navGrid.querySelectorAll(".nav-dot");
+    dots.forEach((dot,i)=>{
+      dot.classList.toggle("answered", !!state.answers[i]);
+      dot.classList.toggle("flagged", !!state.flags[i]);
+      dot.classList.toggle("current", i === state.current);
+    });
+  }
+
+  function renderCurrentQuestion(){
+    const idx = state.current;
+    const q = state.questions[idx];
+
+    progressPill.textContent = String(idx+1).padStart(2,"0") + " / " + state.questions.length;
+    progressFill.style.width = (((idx+1)/state.questions.length)*100) + "%";
+
+    qBallTag.textContent = BALL_FMT(q.ball) + " ball";
+    qText.innerHTML = renderQuestionText(q.text);
+    qTableHolder.innerHTML = q.table ? renderTable(q.table) : "";
+
+    flagBtn.classList.toggle("on", !!state.flags[idx]);
+    flagBtn.textContent = state.flags[idx] ? "⚑ Belgilangan" : "⚑ Belgilash";
+
+    qOptions.innerHTML = "";
+    const chosen = state.answers[idx];
+
+    LETTERS.forEach(letter=>{
+      const hasTableOptions = !!q.optionTables;
+      const content = hasTableOptions ? q.optionTables[letter] : q.options[letter];
+      if (content === undefined) return;
+
+      const optDiv = document.createElement("label");
+      optDiv.className = "option" + (chosen === letter ? " picked" : "");
+
+      const radio = document.createElement("input");
+      radio.type = "radio"; radio.name = "opt"; radio.value = letter;
+      radio.checked = chosen === letter;
+      radio.addEventListener("change", ()=>{
+        state.answers[idx] = letter;
+        refreshNavGrid();
+        renderCurrentQuestion();
+      });
+
+      const letterSpan = document.createElement("span");
+      letterSpan.className = "opt-letter";
+      letterSpan.textContent = letter + ")";
+
+      const bodySpan = document.createElement("span");
+      bodySpan.className = "opt-body";
+      bodySpan.innerHTML = hasTableOptions ? renderTable(content) : escapeHtml(content);
+
+      optDiv.appendChild(radio);
+      optDiv.appendChild(letterSpan);
+      optDiv.appendChild(bodySpan);
+      qOptions.appendChild(optDiv);
+    });
+
+    btnPrev.disabled = idx === 0;
+    btnNext.disabled = idx === state.questions.length - 1;
+
+    refreshNavGrid();
+  }
+
+  btnPrev.addEventListener("click", ()=>{ if (state.current > 0){ state.current--; renderCurrentQuestion(); window.scrollTo(0,0); } });
+  btnNext.addEventListener("click", ()=>{ if (state.current < state.questions.length - 1){ state.current++; renderCurrentQuestion(); window.scrollTo(0,0); } });
+  flagBtn.addEventListener("click", ()=>{
+    state.flags[state.current] = !state.flags[state.current];
+    refreshNavGrid();
+    renderCurrentQuestion();
+  });
+
+  document.addEventListener("keydown", (e)=>{
+    if (document.getElementById("screen-quiz").classList.contains("hidden")) return;
+    if (e.key === "ArrowRight" && !btnNext.disabled){ btnNext.click(); }
+    else if (e.key === "ArrowLeft" && !btnPrev.disabled){ btnPrev.click(); }
+    else {
+      const letter = e.key.toUpperCase();
+      if (["A","B","C","D"].includes(letter)){
+        const radios = qOptions.querySelectorAll("input[type=radio]");
+        radios.forEach(r=>{ if (r.value === letter){ r.checked = true; r.dispatchEvent(new Event("change")); } });
+      }
+    }
+  });
+
+  // ---------- REVIEW SCREEN ----------
+  const reviewGrid = document.getElementById("review-grid");
+  btnFinish.addEventListener("click", ()=>{
+    buildReviewGrid();
+    document.getElementById("rv-answered").textContent = state.answers.filter(a=>a!==null).length;
+    document.getElementById("rv-flagged").textContent = state.flags.filter(Boolean).length;
+    document.getElementById("screen-quiz").classList.add("hidden");
+    document.getElementById("screen-review").classList.remove("hidden");
+    window.scrollTo(0,0);
+  });
+
+  function buildReviewGrid(){
+    reviewGrid.innerHTML = "";
+    state.questions.forEach((q,i)=>{
+      const cell = document.createElement("div");
+      const ans = state.answers[i];
+      cell.className = "review-cell " + (ans ? "answered" : "unanswered") + (state.flags[i] ? " flagged" : "");
+      cell.textContent = i+1;
+      cell.addEventListener("click", ()=>{
+        state.current = i;
+        renderCurrentQuestion();
+        document.getElementById("screen-review").classList.add("hidden");
+        document.getElementById("screen-quiz").classList.remove("hidden");
+        window.scrollTo(0,0);
+      });
+      reviewGrid.appendChild(cell);
+    });
+  }
+
+  document.getElementById("btn-back-to-quiz").addEventListener("click", ()=>{
+    document.getElementById("screen-review").classList.add("hidden");
+    document.getElementById("screen-quiz").classList.remove("hidden");
+    window.scrollTo(0,0);
+  });
+  document.getElementById("btn-confirm-finish").addEventListener("click", showResults);
+
+  // ---------- RESULT SCREEN ----------
+  function launchConfetti(){
+    const colors = ["#0d9db3","#c9740f","#1a8f5a","#3fd3e8"];
+    for(let i=0;i<40;i++){
+      const p = document.createElement("div");
+      p.className = "confetti-piece";
+      p.style.left = Math.random()*100 + "vw";
+      p.style.background = colors[i % colors.length];
+      p.style.animationDuration = (2.2 + Math.random()*1.4) + "s";
+      p.style.animationDelay = (Math.random()*0.4) + "s";
+      p.style.opacity = String(0.7 + Math.random()*0.3);
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(), 4200);
+    }
+  }
+
+  function showResults(){
+    clearInterval(state.timerHandle);
+    state.elapsedSeconds = TOTAL_SECONDS - state.secondsLeft;
+
+    let totalScore = 0, maxScore = 0, correctCount = 0;
+    const tierScores = {}; const tierMax = {};
+    const tbody = document.getElementById("res-tbody");
+    tbody.innerHTML = "";
+
+    state.questions.forEach((q,i)=>{
+      maxScore += q.ball;
+      const key = q.tierBall;
+      tierMax[key] = (tierMax[key]||0) + q.ball;
+      const given = state.answers[i];
+      const isCorrect = given === q.correct;
+      if (isCorrect){ totalScore += q.ball; correctCount++; tierScores[key] = (tierScores[key]||0) + q.ball; }
+      else { tierScores[key] = tierScores[key]||0; }
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="center">${i+1}</td>
+        <td class="center">${BALL_FMT(q.ball)}</td>
+        <td class="center">${isCorrect ? '<span class="tag-ok">To\'g\'ri ✓</span>' : '<span class="tag-bad">Xato ✗</span>'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const pct = Math.round((totalScore/maxScore)*100);
+
+    document.getElementById("res-percent").textContent = pct + "%";
+    document.getElementById("res-scoreline").textContent = (Math.round(totalScore*100)/100) + " / " + (Math.round(maxScore*100)/100) + " ball";
+    document.getElementById("res-correct").textContent = correctCount + "/" + state.questions.length;
+    document.getElementById("res-time").textContent = fmtTime(state.elapsedSeconds);
+    document.getElementById("res-grade-disp").textContent = state.grade + "-sinf";
+
+    // gauge animation
+    const circumference = 2 * Math.PI * 74;
+    const gaugeFill = document.getElementById("gauge-fill");
+    gaugeFill.setAttribute("stroke-dasharray", String(circumference));
+    gaugeFill.setAttribute("stroke-dashoffset", String(circumference));
+    requestAnimationFrame(()=>{
+      const offset = circumference * (1 - pct/100);
+      gaugeFill.style.stroke = pct>=85 ? "var(--good)" : (pct>=50 ? "var(--accent)" : "var(--bad)");
+      setTimeout(()=>{ gaugeFill.setAttribute("stroke-dashoffset", String(offset)); }, 60);
+    });
+
+    const verdict = document.getElementById("res-verdict");
+    let verdictText, verdictClass, badgeColor;
+    if (pct >= 85){ verdictText = "A'lo natija! 🏆"; verdictClass = "great"; badgeColor = "var(--good)"; }
+    else if (pct >= 60){ verdictText = "Yaxshi natija, davom eting"; verdictClass = "ok"; badgeColor = "var(--accent)"; }
+    else { verdictText = "Yana mashq qiling — uddalaysiz"; verdictClass = "retry"; badgeColor = "var(--bad)"; }
+    verdict.textContent = verdictText;
+    verdict.className = "verdict " + verdictClass;
+    if (verdictClass === "great") launchConfetti();
+
+    // tier breakdown (keys: 0.9, 1.5, 2.6)
+    function fillTier(elBar, elVal, key){
+      const got = Math.round((tierScores[key]||0)*100)/100;
+      const max = Math.round((tierMax[key]||0)*100)/100;
+      const p = max ? (got/max*100) : 0;
+      document.getElementById(elBar).style.width = p + "%";
+      document.getElementById(elVal).textContent = got + "/" + max;
+    }
+    fillTier("tb1","tb1v",0.9);
+    fillTier("tb2","tb2v",1.5);
+    fillTier("tb3","tb3v",2.6);
+
+    // certificate fields
+    document.getElementById("cert-name").textContent = state.name;
+    document.getElementById("cert-score").textContent = (Math.round(totalScore*100)/100) + " / " + (Math.round(maxScore*100)/100) + " ball";
+    const UZ_MONTHS = ["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"];
+    const nowD = new Date();
+    document.getElementById("cert-date").textContent = nowD.getDate() + "-" + UZ_MONTHS[nowD.getMonth()] + " " + nowD.getFullYear() + "-yil";
+    document.getElementById("cert-ribbon-text").textContent = state.grade + "-SINF · " + pct + "% NATIJA";
+    document.getElementById("cert-verdict-mini").textContent =
+      verdictClass === "great" ? "a'lo" : (verdictClass === "ok" ? "yaxshi" : "qoniqarli");
+
+    if (!state.certSerial){
+      const d = new Date();
+      const datePart = String(d.getFullYear()) + String(d.getMonth()+1).padStart(2,"0") + String(d.getDate()).padStart(2,"0");
+      const randPart = Math.random().toString(36).slice(2,6).toUpperCase();
+      state.certSerial = "IT-" + datePart + "-" + randPart;
+    }
+    document.getElementById("cert-serial-num").textContent = state.certSerial;
+
+    document.getElementById("screen-quiz").classList.add("hidden");
+    document.getElementById("screen-review").classList.add("hidden");
+    document.getElementById("screen-result").classList.remove("hidden");
+    window.scrollTo(0,0);
+  }
+
+  const certOverlay = document.getElementById("cert-modal-overlay");
+  function openCertModal(){ certOverlay.classList.remove("hidden"); }
+  function closeCertModal(){ certOverlay.classList.add("hidden"); }
+  document.getElementById("btn-print-cert").addEventListener("click", openCertModal);
+  document.getElementById("cert-modal-close").addEventListener("click", closeCertModal);
+  document.getElementById("cert-modal-close-2").addEventListener("click", closeCertModal);
+  certOverlay.addEventListener("click", (e)=>{ if (e.target === certOverlay) closeCertModal(); });
+  document.getElementById("btn-print-cert-modal").addEventListener("click", ()=>{ window.print(); });
+
+  document.getElementById("btn-restart").addEventListener("click", ()=>{
+    document.getElementById("screen-result").classList.add("hidden");
+    document.getElementById("screen-start").classList.remove("hidden");
+    document.getElementById("chrome-title").textContent = "olimpiada_informatika.run";
+    nameInput.value = "";
+    classGrid.querySelectorAll(".class-btn").forEach(b=>b.classList.remove("selected"));
+    selectedGrade = null;
+    window.scrollTo(0,0);
+  });
+
+  // ---------- THEME TOGGLE ----------
+  const themeToggle = document.getElementById("theme-toggle");
+  let manualTheme = null;
+  themeToggle.addEventListener("click", ()=>{
+    const cur = document.documentElement.getAttribute("data-theme");
+    const isDarkNow = cur === "dark" || (!cur && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    manualTheme = isDarkNow ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", manualTheme);
+    themeToggle.textContent = manualTheme === "dark" ? "☀" : "◐";
+  });
+
+})();
+</script>
+</body>
+</html>
